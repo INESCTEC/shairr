@@ -1,0 +1,115 @@
+:host {
+    display: block;
+}
+
+.dataset-preview-card {
+    height: calc(100vh - 170px);
+}
+
+.dataset-preview-body {
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
+    min-height: 0;
+}
+
+.dataset-metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--cui-border-color);
+    font-size: 0.875rem;
+    color: var(--cui-secondary-color);
+}
+
+.loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 300px;
+}
+
+.tabulator-container {
+    flex: 1;
+    min-height: 0;
+
+    overflow: hidden;
+}
+
+.empty-state {
+    padding: 2rem;
+
+    text-align: center;
+
+    color: var(--cui-secondary-color);
+}
+
+#dataset-head {
+    height: 100%;
+}
+
+/* ------------------------------- */
+/* Tabulator overrides */
+/* ------------------------------- */
+
+:host ::ng-deep .tabulator {
+    height: 100%;
+
+    font-size: 13px;
+
+    border-radius: 0.375rem;
+}
+
+:host ::ng-deep .tabulator-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+:host ::ng-deep .tabulator-col-title {
+    font-weight: 600;
+}
+
+:host ::ng-deep .tabulator-header-filter input {
+    width: 100%;
+
+    font-size: 12px;
+}
+
+:host ::ng-deep .tabulator-cell {
+    padding: 4px 8px;
+}
+
+:host ::ng-deep .tabulator-row:nth-child(even) {
+    background-color: #fafafa;
+}
+
+:host ::ng-deep .tabulator-row:hover {
+    background-color: #eef6ff;
+}
+
+:host ::ng-deep .tabulator-footer {
+    border-top: 1px solid var(--cui-border-color);
+}
+
+/* ------------------------------- */
+/* Sequence columns */
+/* ------------------------------- */
+
+:host ::ng-deep .sequence-column {
+    font-family:
+        'Cascadia Mono',
+        Consolas,
+        Monaco,
+        'Courier New',
+        monospace;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

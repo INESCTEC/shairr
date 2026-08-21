@@ -1,0 +1,66 @@
+.species-autocomplete {
+  position: relative;
+  width: 100%;
+
+  .input-group {
+    position: relative;
+    width: 100%;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1060; 
+    margin-top: 2px;
+    width: 100%;
+    max-height: 350px;
+    overflow-y: auto;
+  }
+
+  .species-label {
+    color: var(--cui-dropdown-link-color);
+    margin-bottom: 0.125rem;
+  }
+
+  .species-id {
+    font-family: var(--cui-font-monospace);
+    font-size: 0.75rem;
+  }
+
+  .species-synonyms {
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .species-definition {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    font-style: italic;
+    border-left: 2px solid var(--cui-border-color);
+    padding-left: 0.5rem;
+  }
+}
+
+.dropdown-item {
+
+  &:hover,
+  &.active {
+    .species-label {
+      color: var(--cui-dropdown-link-hover-color);
+    }
+  }
+}
+
+.scrub-b70159 {
+  padding: 0px;
+}
+
+.scrub-1f9bff {
+  max-height: 350px;
+  overflow-y: auto;
+  position: absolute;
+  top: 100%;
+  z-index: 1000;
+}

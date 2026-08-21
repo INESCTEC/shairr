@@ -1,0 +1,102 @@
+<ng-container>
+    <c-navbar class="w-100">
+        <c-container [fluid]="true">
+            <div class="d-flex align-items-center justify-content-between d-lg-none w-100">
+                <button [cNavbarToggler] cOffcanvasToggle="OffcanvasSidebar" class="navbar-toggler me-2">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand small-logo" routerLink=".">
+                    <img src="assets/images/logos/logo_shairr.png" class="img-fluid" class="scrub-5b61b6">
+                </a>
+
+                <c-header-nav class="d-flex">
+                </c-header-nav>
+            </div>
+
+            <c-header-nav class="d-none d-lg-flex feature-nav-item">
+                <c-nav-item class="nav-link">
+                    <a class="project-title" routerLink=".">
+                        <img src="assets/images/logos/logo_shairr.png" class="scrub-5b61b6">
+                    </a>
+                </c-nav-item>
+                <div class="context-giver">
+                    <app-roadmap></app-roadmap>
+                </div>
+            </c-header-nav>
+
+            <c-header-nav class="d-none d-lg-flex ms-3">
+                <c-nav-item>
+                    <ng-container *ngTemplateOutlet="settingsButton"></ng-container>
+                </c-nav-item>
+            </c-header-nav>
+
+            <c-offcanvas placement="end" id="OffcanvasSidebar" [backdrop]="false">
+                <c-offcanvas-header>
+                    <h5 cOffcanvasTitle>Menu</h5>
+                    <button cButtonClose class="text-reset" cOffcanvasToggle="OffcanvasSidebar"
+                        aria-label="Close"></button>
+                </c-offcanvas-header>
+                <c-offcanvas-body>
+                    <c-navbar-nav>
+                        <c-nav-item>
+                            <a cNavLink routerLink="home/dashboard">Home</a>
+                        </c-nav-item>
+                        <ng-container *ngTemplateOutlet="datasourcesDropdown"></ng-container>
+                    </c-navbar-nav>
+                </c-offcanvas-body>
+            </c-offcanvas>
+        </c-container>
+    </c-navbar>
+
+
+    <div id="header-separator"></div>
+
+</ng-container>
+
+<ng-template #datasourcesDropdown>
+    <c-dropdown variant="nav-item" [popper]="false">
+        <button cButton color="" cDropdownToggle class="nav-link">
+            Datasources
+        </button>
+        <ul cDropdownMenu class="pt-0 pr-5 w-auto">
+            <li>
+                <a routerLink="datasources/upload" cDropdownItem>
+                    <svg cIcon class="me-2" name="cilCloudUpload"></svg>
+                    Upload
+                </a>
+            </li>
+            <li>
+                <a routerLink="datasources/generate" cDropdownItem>
+                    <svg cIcon class="me-2" name="cilApplicationsSettings"></svg>
+                    Generate
+                </a>
+            </li>
+            <li>
+                <a routerLink="datasources/airr" cDropdownItem>
+                    <svg cIcon class="me-2" name="cilGrid"></svg>
+                    AIRR-Seq
+                </a>
+            </li>
+            <li>
+                <a routerLink="datasources/pdb/search" cDropdownItem>
+                    <i class="fa fa-database me-2"></i>
+                    Protein Data Bank
+                </a>
+            </li>
+        </ul>
+    </c-dropdown>
+</ng-template>
+
+<ng-template #settingsButton>
+    <button cButton color="link" class="btn py-0 pe-0 nav-link btn-link ng-star-inserted" class="scrub-903040"
+        (click)="settings()">
+        <svg cIcon name="cilSettings" size="xl" class="icon" role="img"></svg>
+    </button>
+</ng-template>
+
+<ng-template #notificationsButton>
+    <button cButton color="link" class="btn py-0 pe-0 nav-link btn-link ng-star-inserted" class="scrub-903040"
+        cOffcanvasToggle="OffcanvasEnd"  >
+        <svg cIcon name="cilBell" size="xl" class="icon" role="img"></svg>
+    </button>
+</ng-template>

@@ -1,0 +1,57 @@
+:host {
+    ng-scrollbar {
+        --scrollbar-thumb-color: var(--cui-border-color, #999);
+        --scrollbar-track-color: var(--cui-body-color, #fff);
+        --scrollbar-hover-size: calc(var(--scrollbar-size) * 1.5);
+    }
+}
+
+.workspace {
+    .workspace-actions {
+        .nav-link {
+            color: #fff;
+        }
+
+        .active {
+            color: var(--cui-nav-tabs-link-active-color);
+        }
+    }
+
+    .title {
+        text-align: center;
+        margin: 8px;
+        padding: 4px;
+
+        .label {
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .name {
+            font-size: 20px;
+        }
+
+        .delete {
+            cursor: pointer;
+        }
+    }
+
+    .file {
+        cursor: pointer;
+        display: block;
+
+        .filename {
+            .icon {
+                margin-right: 8px;
+            }
+        }
+
+        .file-details {
+            font-size: 10px;
+            padding: var(--cui-sidebar-nav-link-padding-y) var(--cui-sidebar-nav-link-padding-x);
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+    }
+}

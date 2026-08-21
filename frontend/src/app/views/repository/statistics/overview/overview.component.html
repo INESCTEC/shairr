@@ -1,0 +1,84 @@
+<c-card>
+    <c-card-header class="d-flex justify-content-between align-items-center">
+        <span class="fw-bold">Repertoire Statistics</span>
+    </c-card-header>
+
+    <c-card-body>
+        <!-- Loading Screen -->
+        <div *ngIf="loading || installingImmunarch" class="text-center py-5">
+            <div class="spinner-container">
+                <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                
+                <!-- Installation progress section -->
+                <div *ngIf="installingImmunarch" class="mt-4">
+                    <h5 class="text-primary">Installing Immunarch</h5>
+                    <p class="text-muted mt-2">{{ installStatus }}</p>
+                    
+                    <div class="progress mt-3" style="height: 25px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" 
+                             [style.width.%]="installProgress" 
+                             [attr.aria-valuenow]="installProgress" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ installProgress }}%
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 text-muted small">
+                        <i class="fa fa-info-circle me-1"></i>
+                        This is a one-time setup. The Immunarch statistical package is being installed in your Docker environment.
+                    </div>
+                </div>
+                
+                <!-- General loading section -->
+                <div *ngIf="loading && !installingImmunarch" class="mt-4">
+                    <h5 class="text-secondary">Loading Statistics</h5>
+                    <p class="text-muted">Please wait while we load your data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content (only shown when not loading and not installing) -->
+        <div *ngIf="!loading && !installingImmunarch">
+            <!-- Tab headers -->
+            <c-nav variant="tabs" role="tablist">
+                <a cNavLink [class.active]="activeTab==='cdr3'" (click)="activeTab='cdr3'">
+                    <i class="fa fa-bar-chart me-2"></i> CDR3 Length
+                </a>
+                <a cNavLink [class.active]="activeTab==='top'" (click)="activeTab='top'">
+                    <i class="fa fa-list-ol me-2"></i> Top Clones
+                </a>
+                <a cNavLink [class.active]="activeTab==='usage'" (click)="activeTab='usage'">
+                    <i class="fa fa-sitemap me-2"></i> Gene Usage
+                </a>
+            </c-nav>
+
+            <!-- Content -->
+            <div class="p-3 border border-top-0 rounded-bottom">
+                <ng-container [ngSwitch]="activeTab">
+                    <ng-container *ngSwitchCase="'cdr3'">
+                        <app-cdr3-length [repertoires]="repertoires">
+                        </app-cdr3-length>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'top'">
+                        <app-top-clones [repertoires]="repertoires">
+                        </app-top-clones>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'usage'">
+                        <div class="d-grid gap-4">
+                            <app-gene-usage [repertoires]="repertoires" kind="V">
+                            </app-gene-usage>
+                            <app-gene-usage [repertoires]="repertoires" kind="J">
+                            </app-gene-usage>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </c-card-body>
+</c-card>

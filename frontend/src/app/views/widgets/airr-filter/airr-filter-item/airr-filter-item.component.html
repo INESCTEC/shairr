@@ -1,0 +1,8 @@
+<label cLabel for="{{ airrField.field }}">{{ airrField.title }}</label>
+<c-input-group>
+    <input cFormControl id="{{ airrField.field }}" [(ngModel)]="airrField.value" type="text"
+        (keydown.enter)="onApply()" />
+    <button cButton color="primary" type="button" variant="outline" (click)="onApply()">
+        Apply
+    </button>
+</c-input-group>

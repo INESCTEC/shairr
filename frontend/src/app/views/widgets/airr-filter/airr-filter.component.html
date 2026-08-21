@@ -1,0 +1,69 @@
+<c-card>
+    <c-card-body>
+        <c-row>
+            <c-col>
+                <c-accordion>
+                    <c-accordion-item #fsubject="cAccordionItem" [visible]="false">
+                        <ng-template cTemplateId="accordionHeaderTemplate">
+                            <button (click)="fsubject.toggleItem()" [collapsed]="!fsubject.visible" cAccordionButton>
+                                Filter by subject
+                            </button>
+                        </ng-template>
+                        <ng-template cTemplateId="accordionBodyTemplate">
+                            <div class="accordion-body">
+                                <app-airr-filter-item *ngFor="let s of filterSubject" [field]="s"
+                                    (filtered)="onFiltered($event)"></app-airr-filter-item>
+                            </div>
+                        </ng-template>
+                    </c-accordion-item>
+                </c-accordion>
+            </c-col>
+            <c-col>
+                <c-accordion>
+                    <c-accordion-item #fstudy="cAccordionItem" [visible]="false">
+                        <ng-template cTemplateId="accordionHeaderTemplate">
+                            <button (click)="fstudy.toggleItem()" [collapsed]="!fstudy.visible" cAccordionButton>
+                                Filter by study
+                            </button>
+                        </ng-template>
+                        <ng-template cTemplateId="accordionBodyTemplate">
+                            <div class="accordion-body">
+                                <app-airr-filter-item *ngFor="let s of filterStudy" [field]="s"
+                                    (filtered)="onFiltered($event)"></app-airr-filter-item>
+                            </div>
+                        </ng-template>
+                    </c-accordion-item>
+                </c-accordion>
+            </c-col>
+            <c-col>
+                <c-accordion>
+                    <c-accordion-item #fsample="cAccordionItem" [visible]="false">
+                        <ng-template cTemplateId="accordionHeaderTemplate">
+                            <button (click)="fsample.toggleItem()" [collapsed]="!fsample.visible" cAccordionButton>
+                                Filter by sample
+                            </button>
+                        </ng-template>
+                        <ng-template cTemplateId="accordionBodyTemplate">
+                            <div class="accordion-body">
+                                <app-airr-filter-item *ngFor="let s of filterSample" [field]="s"
+                                    (filtered)="onFiltered($event)"></app-airr-filter-item>
+                            </div>
+                        </ng-template>
+                    </c-accordion-item>
+                </c-accordion>
+            </c-col>
+        </c-row>
+
+        <div *ngIf="filtersSelected.length" class="l-4">
+            <h6>Filtering for:</h6>
+            <c-row>
+                <c-col>
+                    <c-badge color="primary" *ngFor="let f of filtersSelected; let i = index">{{ f.title }} : {{ f.value
+                        }}
+                        <i class="fa fa-close" (click)="onRemoveFilter(i)"></i>
+                    </c-badge>
+                </c-col>
+            </c-row>
+        </div>
+    </c-card-body>
+</c-card>

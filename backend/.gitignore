@@ -1,0 +1,15 @@
+__pycache__
+.env
+venv
+data
+.vscode
+.nextflow
+.idea
+
+# Nextflow related outputs
+.nextflow
+.nextflow.log
+rc.txt
+stderr.txt
+stdout.txt
+plugins/*

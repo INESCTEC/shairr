@@ -1,0 +1,575 @@
+<c-card class="mb-4">
+    <c-card-body>
+        <div>
+            <h2 class="mb-2">ShAIRR Dashboard</h2>
+
+            <p class="text-body-secondary mb-0">
+                ShAIRR is a structured data management and sharing framework that
+                operationalizes AIRR Community standards and FAIR data principles in a practical,
+                end-to-end environment.
+            </p>
+        </div>
+    </c-card-body>
+</c-card>
+
+<c-card class="mb-4">
+    <c-card-body>
+        <c-tabs [activeItemKey]="'studies'" (activeItemKeyChange)="handleChange($event)">
+            <c-tabs-list variant="tabs" class="mb-4">
+                <button cTab itemKey="studies" class="p-3">
+                    <i class="fa fa-database"></i> Repository
+                </button>
+
+                <button cTab itemKey="datasets" class="p-3">
+                    <i class="fa fa-file"></i> File Management
+                </button>
+            </c-tabs-list>
+
+            <c-tabs-content>
+                <c-tab-panel class="repository-tab-panel" itemKey="studies">
+                    <div class="repository-section-header">
+                        <div>
+                            <h4 class="mb-1">Repository</h4>
+
+                            <p class="text-body-secondary mb-0">
+                                Browse, filter, import, export and manage genetic studies.
+                            </p>
+                        </div>
+
+                        <div class="repository-actions" *ngIf="activeTab == 'studies'">
+                            <button cButton class="btn btn-primary" [routerLink]="['/repository/create-study']">
+
+                                <i class="fa fa-plus-circle me-2"></i>
+                                Create
+                            </button>
+
+                            <button cButton color="primary" (click)="goToStatistics()">
+                                <i class="fa fa-pie-chart me-2"></i>
+                                Statistics
+                            </button>
+
+                            <c-dropdown>
+                                <button type="button" cButton cDropdownToggle color="light">
+
+                                    <i class="fa fa-file-text-o me-2"></i>
+                                    CSV Actions
+                                </button>
+
+                                <ul cDropdownMenu>
+                                    <li>
+                                        <button type="button" cDropdownItem (click)="downloadStudiesCSV()">
+                                            <i class="fa fa-download me-2"></i>
+                                            Export CSV
+                                        </button>
+                                    </li>
+
+                                    <li>
+                                        <input id="input-import-studies-csv" accept=".csv" type="file" class="d-none" />
+                                        <button type="button" cDropdownItem (click)="importStudyCSV()">
+                                            <i class="fa fa-upload me-2"></i>
+                                            Import CSV
+                                        </button>
+                                    </li>
+                                </ul>
+                            </c-dropdown>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="repository-filter-toolbar">
+                            <div class="repository-filter-select">
+                                <select class="form-select" id="filter-select" [(ngModel)]="selectedFilter"
+                                    [ngModelOptions]="{standalone: true}">
+
+                                    <optgroup label="Study">
+                                        <option
+                                            *ngFor="let studyFilters of ['Study ID', 'Study Title', 'Study Description', 'Contributors']"
+                                            [value]="studyFilters">
+
+                                            {{ studyFilters }}
+                                        </option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <div class="repository-filter-search">
+                                <c-input-group>
+                                    <input type="text" class="form-control" placeholder="Search studies..."
+                                        name="subjectFilter" id="filter-input" [(ngModel)]="filterInput"
+                                        [ngModelOptions]="{standalone: true}" (keyup.enter)="addFilter()" />
+
+                                    <button type="button" cButton color="primary" class="repository-filter-button"
+                                        (click)="addFilter()">
+
+                                        <i class="fa fa-filter me-2"></i>
+                                        Add Filter
+                                    </button>
+                                </c-input-group>
+                            </div>
+
+                            <!--<button cButton color="light" class="repository-filter-button"
+                                        (click)="resetFilters()">
+                                        Reset
+                                    </button>
+                                </c-button-group>-->
+
+                            <c-button-group class="repository-view-toggle" aria-label="Study view toggle" role="group">
+                                <input class="btn-check" name="radio1" type="radio" value="Radio1" [checked]="card" />
+
+                                <label (click)="card = true" cButton cFormCheckLabel variant="outline">
+
+                                    <i class="fa fa-id-card me-1" aria-hidden="true"></i>
+                                    Card
+                                </label>
+
+                                <input class="btn-check" name="radio1" type="radio" value="Radio2" [checked]="!card" />
+
+                                <label (click)="card = false" cButton cFormCheckLabel variant="outline">
+
+                                    <i class="fa fa-table me-1" aria-hidden="true"></i>
+                                    Table
+                                </label>
+                            </c-button-group>
+                        </div>
+
+                        <div class="repository-active-filters" *ngIf="studyFilters.length > 0">
+                            <strong class="repository-active-filters-title">
+                                Active Filters
+                            </strong>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <c-badge *ngFor="let filter of studyFilters" color="secondary"
+                                    class="repository-filter-badge">
+
+                                    {{ filter[0] }}: {{ filter[1] }}
+
+                                    <i class="fa fa-times ms-2 repository-filter-remove" (click)="removeFilter(filter)">
+                                    </i>
+                                </c-badge>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ng-container *ngIf="loading">
+                        <div class="repository-loading">
+                            <c-spinner></c-spinner>
+                        </div>
+                    </ng-container>
+
+                    @if (!loading && card) {
+                    <c-row [lg]="3" [md]="2" [xs]="1" class="g-4">
+                        <c-col *ngFor="let study of getFilteredStudies()">
+                            <c-card class="workspace-card h-100 border-0 shadow-sm" *ngIf="study">
+                                <c-card-header class="workspace-card-header bg-transparent">
+                                    <div class="workspace-card-title">
+                                        <span class="fw-semibold">
+                                            {{ study.study_title.length > 60 ? study.study_title.substring(0, 60) +
+                                            '...' : study.study_title }}
+                                        </span>
+
+                                        <small class="text-body-secondary">
+                                            {{ study.study_id }}
+                                        </small>
+                                    </div>
+
+                                    <button cButton color="ghost-danger" size="sm" class="workspace-card-delete"
+                                        title="Delete study" aria-label="Delete study"
+                                        (click)="deleteStudy(study); $event.stopPropagation()">
+
+                                        <i class="fa fa-trash fa-lg"></i>
+                                    </button>
+                                </c-card-header>
+
+                                <c-card-body class="workspace-card-body workspace-card-click-area"
+                                    [routerLink]="['/repository/edit-study/', study.id]" title="Open study">
+
+                                    <p class="workspace-card-description text-body-secondary">
+                                        {{ study.study_description }}
+                                    </p>
+
+                                    <div class="workspace-card-metadata">
+                                        <div class="workspace-card-metadata-item">
+                                            <span class="workspace-card-metadata-icon">
+                                                <img class="sequencing-icon"
+                                                    src="assets/images/icons/b_cell_t_cell.png" />
+                                            </span>
+
+                                            <span>
+                                                <strong>Cell Subset:</strong>
+                                                {{ getStudyCellSubset(study) }}
+                                            </span>
+                                        </div>
+
+                                        <div class="workspace-card-metadata-item">
+                                            <span class="workspace-card-metadata-icon">
+                                                <img class="sequencing-icon" src="assets/images/icons/sequencing.png" />
+                                            </span>
+
+                                            <span>
+                                                <strong>Sequencing Type:</strong>
+                                                {{ getStudySequencingType(study) }}
+                                            </span>
+                                        </div>
+
+                                        <div class="workspace-card-metadata-item">
+                                            <span class="workspace-card-metadata-icon">
+                                                <i class="fa fa-users"></i>
+                                            </span>
+
+                                            <span>
+                                                <strong>Subjects:</strong>
+                                                {{ getSubjectsCount(study.id) > 0 ? getSubjectsCount(study.id) + '
+                                                subjects' : 'No subjects' }}
+                                            </span>
+                                        </div>
+
+                                        <div class="workspace-card-metadata-item">
+                                            <span class="workspace-card-metadata-icon">
+                                                <i class="fa fa-flask" aria-hidden="true"></i>
+                                            </span>
+
+                                            <span>
+                                                <strong>Samples:</strong>
+                                                {{ getSamplesCount(study.id) > 0 ? getSamplesCount(study.id) + '
+                                                samples' : 'No samples' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </c-card-body>
+
+                                <c-card-footer class="workspace-card-footer bg-transparent">
+                                    <div class="workspace-card-footer-badges">
+                                        <c-badge (click)="togglePublicStatus(study.id)"
+                                            class="repository-state-badge public-badge"
+                                            [style]="{'background-color': (study.public ? '#198754' : '#6c757d')}">
+
+                                            @if (study.public) {
+                                            <i class="fa fa-eye public-badge-icons"></i>
+                                            Public
+                                            } @else {
+                                            <i class="fa fa-eye-slash public-badge-icons"></i>
+                                            Private
+                                            }
+                                        </c-badge>
+
+                                        <c-badge (click)="toggleStatsSelection(study.id)"
+                                            class="repository-state-badge stats-badge"
+                                            [style]="{'background-color': (study.stats ? '#0dcaf0' : '#adb5bd')}">
+
+                                            @if (study.stats) {
+                                            <i class="fa fa-check stats-badge-icons"></i>
+                                            Selected for Statistics
+                                            } @else {
+                                            <i class="fa fa-hand-o-up stats-badge-icons"></i>
+                                            Not Selected for Statistics
+                                            }
+                                        </c-badge>
+                                    </div>
+
+                                    <a class="workspace-card-open-link"
+                                        [routerLink]="['/repository/edit-study/', study.id]" aria-label="Open study">
+
+                                        Open study
+                                        <i class="fa fa-arrow-right ms-2"></i>
+                                    </a>
+                                </c-card-footer>
+                            </c-card>
+                        </c-col>
+                    </c-row>
+                    } @else if (!loading && !card) {
+                    <div class="table-responsive repository-table-wrapper">
+                        <table hover [striped]="true" cTable class="study-table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Study ID</th>
+                                    <th scope="col">Study Title</th>
+                                    <th scope="col">Cell Subset</th>
+                                    <th scope="col">Sequencing Type</th>
+                                    <th scope="col">Subjects</th>
+                                    <th scope="col">Samples</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Statistics</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @if (!loading && studies.length > 0) {
+                                <tr *ngFor="let study of getFilteredStudies()" class="repository-table-row"
+                                    [routerLink]="['/repository/edit-study/' + study.id]">
+
+                                    <td>
+                                        <span class="fw-semibold">
+                                            {{ study.study_id }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <em>{{ study.study_title }}</em>
+                                    </td>
+
+                                    <td>
+                                        <span class="d-inline-flex align-items-center gap-2">
+                                            <img class="sequencing-icon" src="assets/images/icons/b_cell_t_cell.png">
+
+                                            {{ getStudyCellSubset(study) }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="d-inline-flex align-items-center gap-2">
+                                            <img class="sequencing-icon" src="assets/images/icons/sequencing.png">
+
+                                            {{ getStudySequencingType(study) }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="d-inline-flex align-items-center gap-2">
+                                            <i class="fa fa-users"></i>
+
+                                            {{ getSubjectsCount(study.id) > 0 ? getSubjectsCount(study.id) + ' subjects'
+                                            : 'No subjects' }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="d-inline-flex align-items-center gap-2">
+                                            <i class="fa fa-flask" aria-hidden="true"></i>
+
+                                            {{ getSamplesCount(study.id) > 0 ? getSamplesCount(study.id) + ' samples' :
+                                            'No samples' }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="repository-table-status"
+                                            [style.color]="study.public ? '#198754' : '#6c757d'">
+
+                                            @if (study.public) {
+                                            <i class="fa fa-eye"></i>
+                                            Public
+                                            } @else {
+                                            <i class="fa fa-eye-slash"></i>
+                                            Private
+                                            }
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="repository-table-status"
+                                            [style.color]="study.stats ? '#0dcaf0' : '#6c757d'">
+
+                                            @if (study.stats) {
+                                            <i class="fa fa-check"></i>
+                                            Selected
+                                            } @else {
+                                            <i class="fa fa-hand-o-up"></i>
+                                            Unselected
+                                            }
+                                        </span>
+                                    </td>
+                                </tr>
+                                } @else {
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="repository-empty-state">
+                                            <h5>No studies found.</h5>
+
+                                            <p class="text-body-secondary mb-0">
+                                                Click the "Import CSV" button to add your first study.
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    }
+                </c-tab-panel>
+
+                <c-tab-panel class="repository-tab-panel" itemKey="datasets">
+                    <div class="repository-section-header">
+                        <div>
+                            <h4 class="mb-1">File management</h4>
+
+                            <p class="text-body-secondary mb-0">
+                                Browse, filter, upload and download repository datasets.
+                            </p>
+                        </div>
+
+                        <div class="repository-actions" *ngIf="activeTab == 'datasets'">
+                            <input id="input-upload-files" accept=".fastq.gz, .fastq, .gz, .tsv" type="file" multiple
+                                class="d-none" />
+
+                            <c-button cButton class="btn btn-primary" (click)="uploadFiles()">
+                                <i class="fa fa-plus-circle me-2"></i>
+                                Upload Files
+                            </c-button>
+
+                            <!--
+                            <c-badge cButton class="btn btn-primary repository-action-button" (click)="goToSendFilesToAnnotation()">
+                                <i class="fa fa-arrow-up me-2"></i>
+                                Send Files for Annotation
+                            </c-badge>
+                            -->
+                        </div>
+                    </div>
+
+                    <c-row *ngIf="uploadingFiles" class="mb-4">
+                        <c-col>
+                            <c-card class="border-0 shadow-sm">
+                                <c-card-body>
+                                    <c-progress [animated]="true" [value]="progressBar" variant="striped" [height]="30">
+                                        Files are being uploaded.
+                                    </c-progress>
+                                </c-card-body>
+                            </c-card>
+                        </c-col>
+                    </c-row>
+
+                    <div class="mb-4">
+                        <div class="repository-filter-toolbar">
+                            <div class="repository-filter-select">
+                                <select class="form-select" id="filter-select" [(ngModel)]="selectedFilter">
+
+                                    <optgroup label="Datasets">
+                                        <option
+                                            *ngFor="let datasetFilters of ['Dataset ID', 'Filename', 'Filesize', 'Line Count', 'Annotated', 'Raw']"
+                                            [value]="datasetFilters">
+
+                                            {{ datasetFilters }}
+                                        </option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <div class="repository-filter-search">
+                                <c-input-group>
+                                    <input type="text" class="form-control" placeholder="Search datasets..."
+                                        name="subjectFilter" id="filter-input" [(ngModel)]="filterInput" />
+
+                                    <button cButton color="primary" class="repository-filter-button"
+                                        (click)="addFilter()">
+                                        <i class="fa fa-filter me-2"></i>
+                                        Add Filter
+                                    </button>
+                                </c-input-group>
+                            </div>
+
+                            <div class="repository-active-filters" *ngIf="datasetFilters.length > 0">
+                                <strong class="repository-active-filters-title">
+                                    Active Filters
+                                </strong>
+
+                                <div class="d-flex flex-wrap gap-2">
+                                    <c-badge *ngFor="let filter of datasetFilters" color="warning"
+                                        class="repository-filter-badge">
+
+                                        {{ filter[0] }}{{ filter[0] != "Annotated" && filter[0] != "Raw" ? ': ' : ' '}}
+                                        {{ filter[1] == '' ? 'Files' : filter[1] }}
+
+                                        <i class="fa fa-times ms-2 repository-filter-remove"
+                                            (click)="removeFilter(filter)">
+                                        </i>
+                                    </c-badge>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive repository-table-wrapper">
+                        <table hover [striped]="false" cTable class="dataset-table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Filename</th>
+                                    <th scope="col">Annotated</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Created On</th>
+                                    <th scope="col" class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @if (!loading && datasets.length > 0) {
+                                @for (dataset of getDatasetsWithGroupColors(); track dataset.id) {
+                                <tr class="repository-table-row" [ngClass]="dataset.groupClass">
+
+                                    <td>
+                                        <span class="fw-semibold">
+                                            {{ dataset.id }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        {{ dataset.filename }}
+                                    </td>
+
+                                    <td>
+                                        <c-badge [color]="dataset.annotated ? 'success' : 'secondary'">
+                                            {{ dataset.annotated ? 'Annotated' : 'Raw' }}
+                                        </c-badge>
+                                    </td>
+
+                                    <td>
+                                        {{ humanFileSize(dataset.filesize) }}
+
+                                        <em class="text-body-secondary ms-1">
+                                            ({{ getRoundedLineCount(dataset.line_count) }} lines)
+                                        </em>
+                                    </td>
+
+                                    <td>
+                                        {{ dataset.time_created | date: 'dd MMM yyyy, HH:mm:ss' }}
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <button cButton class="btn btn-light repository-table-action"
+                                                (click)="downloadFile(dataset)">
+
+                                                <i class="fa fa-download me-2"></i>
+                                                Download
+                                            </button>
+
+                                            <button cButton class="btn btn-light repository-table-action"
+                                                *ngIf="dataset.annotated" (click)="seeDatasetHead(dataset.id)">
+
+                                                <i class="fa fa-eye me-2"></i>
+                                                Preview
+                                            </button>
+
+                                            <button cButton class="btn btn-light repository-table-action disabled"
+                                                *ngIf="!dataset.annotated" disabled>
+
+                                                <i class="fa fa-eye me-2"></i>
+                                                Preview
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                                } @else {
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="repository-empty-state">
+                                            <h5>No datasets found.</h5>
+
+                                            <p class="text-body-secondary mb-0">
+                                                Click the "Upload Files" button to add your first dataset.
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </c-tab-panel>
+            </c-tabs-content>
+        </c-tabs>
+    </c-card-body>
+</c-card>
+
+<dashboard-airr></dashboard-airr>

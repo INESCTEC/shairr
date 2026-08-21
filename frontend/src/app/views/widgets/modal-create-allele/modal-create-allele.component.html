@@ -1,0 +1,32 @@
+<c-modal #modalCreateAllele id="modalCreateAllele" [keyboard]="true" [transition]="false" size="lg">
+    <c-modal-header>
+        <h5 cModalTitle>Create New Allele</h5>
+        <button cButtonClose [cModalToggle]="modalCreateAllele.id"></button>
+    </c-modal-header>
+    <form cForm class="mb-3" [formGroup]="formAllele" (ngSubmit)="onSubmitAllele()">
+        <c-modal-body>
+            <div class="mb-3">
+                <label cLabel>Name</label>
+                <input cFormControl id="name" type="text" formControlName="name" />
+            </div>
+
+            <div class="mhc-class mb-3">
+                <label cLabel>MHC Class</label>
+                <select cSelect id="mhc_class" type="text" formControlName="mhc_class">
+                    <option value="I">
+                        Class I
+                    </option>
+                    <option value="II">
+                        Class II
+                    </option>
+                </select>
+            </div>
+
+        </c-modal-body>
+        <c-modal-footer class="buttons-action justify-content-between">
+            <button cButton type="submit" color="primary" [disabled]="!formAllele.valid">
+                <div >Create</div>
+            </button>
+        </c-modal-footer>
+    </form>
+</c-modal>

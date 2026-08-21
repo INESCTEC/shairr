@@ -1,0 +1,20 @@
+<div
+    [ngStyle]="{'display': 'flex', 'flex-direction': horizontal ? 'row' : 'column', 'align-items': 'flex-start', 'flex-wrap': 'wrap', 'gap': '5px'}">
+    <div class="d-flex alleles flex-wrap mb-0"
+        [ngStyle]="{'flex-direction': horizontal ? 'row' : 'column', 'align-items': horizontal ? 'center' : 'flex-start', gap: horizontal ? '5px' : '0'}"
+        *ngIf="alleles">
+        <div class="meta"
+            [ngStyle]="{'margin-bottom': horizontal ? '0' : '5px', 'margin-right': horizontal ? '5px' : '0', 'min-width': '50px'}"
+            *ngIf="alleles">
+            {{ alleles.length || 0 }} alleles
+        </div>
+
+        <ng-container *ngFor="let allele of alleles">
+            <div class="allele-tag" [ngStyle]="{'background-color': generateMHCBadgeColor(allele)}">
+                {{ allele }}
+                <i *ngIf="!readOnly" (click)="onRemoveAllele(allele)" class="fa fa-times"
+                    class="scrub-5f2b2a"></i>
+            </div>
+        </ng-container>
+    </div>
+</div>

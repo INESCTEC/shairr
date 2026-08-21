@@ -1,0 +1,38 @@
+.statistic {
+    width: 100%;
+}
+
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+.progress {
+    max-width: 400px;
+    margin: 0 auto;
+    border-radius: 25px;
+    background-color: #e9ecef;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width 0.5s ease-in-out;
+    font-weight: bold;
+    line-height: 25px;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.install-status {
+    animation: pulse 2s infinite;
+}

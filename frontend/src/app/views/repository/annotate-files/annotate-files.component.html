@@ -1,0 +1,113 @@
+<c-card>
+  <c-card-header>
+    <c-row class="scrub-de9554">
+      <span cCol>
+        <strong>Annotate Files
+        </strong>
+      </span>
+      <span cCol class="scrub-3e3709">
+        <input id="input-upload-files" accept=".fastq.gz, .fastq, .gz, .tsv" type="file" multiple
+          class="scrub-9c7663" />
+        <c-badge cButton class="btn btn-primary" (click)="uploadFiles()" class="scrub-c3676d">
+          <i class="fa fa-plus-circle me-2"></i>Upload New Files
+        </c-badge>
+      </span>
+    </c-row>
+  </c-card-header>
+
+  @if (!loading && !annotationLoading && files.length > 0) {
+  <c-card-body>
+
+    <c-progress *ngIf="uploadingFiles" class="upload-progress" [animated]="true" [value]="100" variant="striped"
+      [height]="30">
+      Files are being uploaded.
+    </c-progress>
+
+    <form cForm [name]="subjectForm" #subjectForm="ngForm" class="mb-3">
+      <c-row class="p-3" class="scrub-626a3d">
+        <div cRow class="mb-3">
+          <span class="scrub-9544b7">
+            <c-button-group aria-label="Basic outlined example" role="group">
+              <button cButton color="primary" *ngIf="$any(selectedAligner) == 'igblast'" variant="outline"
+                (click)="selectedAligner = ''" class="scrub-54547e">
+                IgBlast
+              </button>
+              <button cButton color="primary" variant="outline" *ngIf="!($any(selectedAligner) == 'igblast')"
+                (click)="selectedAligner = 'igblast'">
+                IgBlast
+              </button>
+              <button cButton color="primary" *ngIf="$any(selectedAligner) == 'mixcr'" variant="outline"
+                (click)="selectedAligner = ''" class="scrub-b6f068">
+                MiXCR
+              </button>
+              <button cButton color="primary" variant="outline" *ngIf="!($any(selectedAligner) == 'mixcr')"
+                (click)="selectedAligner = 'mixcr'" class="scrub-0faf29">
+                MiXCR
+              </button>
+            </c-button-group>
+          </span>
+        </div>
+
+        <div *ngIf="selectedAligner">
+          <div cRow class="mb-3">
+            <div cCol>
+              <label cLabel for="selectFiles">Select Files to Annotate</label>
+              <span class="scrub-d8a253">
+                <select class="form-select" cFormControl (change)="onFileSelect($event)" id="selectFiles"
+                  name="selectFiles">
+                  <option [ngValue]="null" disabled selected>Select a file</option>
+                  <option *ngFor="let file of files" [value]="file.id">
+                    {{ file.filename }} ({{ file.line_count }} lines, {{ humanFileSize(file.filesize) }})
+                  </option>
+                </select>
+                <button cButton class="btn btn-primary btn-md ms-2" variant="outline"
+                  (click)="selectFile(selectedFile)">
+                  Add To Selection
+                </button>
+                <button cButton class="btn btn-primary btn-danger btn-md ms-2" class="scrub-2a5c32" variant="outline"
+                  (click)="selectedFiles = []">
+                  Clear
+                </button>
+              </span>
+              <div class="mt-2" id="selectedFiles" class="scrub-d39635">
+                <c-badge color="info" class="scrub-7c61a8" *ngFor="let file of selectedFiles">
+                  <div cCol class="scrub-d85f34">
+                    <div cRow class="scrub-4e0dc0">
+                      {{ file.filename }}
+                    </div>
+                    <div cRow class="scrub-1c639f">
+                      ({{ file.line_count }} lines, {{ humanFileSize(file.filesize) }})
+                    </div>
+                  </div>
+                  <div cCol class="scrub-885f8c">
+                    <i class="fa fa-times ms-1" class="scrub-5f2b2a" (click)="unselectFile(file)"></i>
+                  </div>
+                </c-badge>
+              </div>
+
+              <div cFormText>
+                Select files to send for annotation.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedAligner == 'mixcr'">
+          Nothing here yet.
+        </div>
+
+        <div *ngIf="selectedAligner == 'igblast'">
+          Nothing here yet.
+        </div>
+
+      </c-row>
+    </form>
+  </c-card-body>
+  } @else if (loading && files.length < 1) { <c-card-body>
+    <div class="fade show" class="scrub-5e865d">
+      <i class="spinner-grow spinner-grow-sm"></i>
+      <span class="m-1">You cannot submit any files to annotation. Please upload files.</span>
+    </div>
+    </c-card-body>
+    }
+</c-card>

@@ -1,0 +1,22 @@
+<div class="autocomplete-container">
+            <input type="text" 
+                   class="form-control" 
+                   [placeholder]="placeholder"
+                   (input)="onInput($event)"
+                   (focus)="onFocus()"
+                   (blur)="onBlur()"
+                   [(ngModel)]="searchTerm"
+                   autocomplete="off"/>
+            
+            <ul class="autocomplete-list" *ngIf="showSuggestions && suggestions.length > 0">
+                <li *ngFor="let term of suggestions" 
+                    (mousedown)="selectTerm(term)"
+                    class="autocomplete-item">
+                    <div class="term-label">{{ term.label }}</div>
+                    <div class="term-id" *ngIf="showId">{{ term.id }}</div>
+                    <div class="term-synonyms" *ngIf="term.synonyms.length > 0">
+                        <small>{{ term.synonyms.join(', ') }}</small>
+                    </div>
+                </li>
+            </ul>
+        </div>

@@ -1,0 +1,53 @@
+image: node:20.19.2-alpine3.22
+
+build-staging:
+  stage: build
+  script:
+    - npm install -g @angular/cli
+    - npm install --progress=false
+    - ng build --configuration=staging
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - dist/*
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+
+build-prod:
+  stage: build
+  script:
+    - npm install -g @angular/cli
+    - npm install --progress=false
+    - ng build --configuration=production
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - dist/*
+  rules:
+    - if: '$CI_COMMIT_TAG'
+
+deploy-tag:
+  stage: deploy
+  variables:
+    DEPLOY_PATH: /opt/shairr/apache/homepage/frontend
+  rules:
+    - if: '$CI_COMMIT_TAG'
+  before_script:
+    - 'command -v ssh-agent >/dev/null || ( apk update && apk add openssh-client )'
+
+    - eval $(ssh-agent -s)
+
+    - chmod 400 "$ID_RSA"
+    - ssh-add "$ID_RSA"
+
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script:
+    # Create destination just in case it doesn't exist (first deployment)
+    - ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "mkdir -p $DEPLOY_PATH"
+    #
+    - ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "rm -rf $DEPLOY_PATH/*"
+    # Copy new files
+    - scp -i $ID_RSA -r $(pwd)/dist/frontend/* $SERVER_USER@$SERVER_IP:$DEPLOY_PATH/
+
+

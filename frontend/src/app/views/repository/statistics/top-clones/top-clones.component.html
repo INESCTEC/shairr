@@ -1,0 +1,168 @@
+<c-card>
+  <c-card-header class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="fw-bold">
+      {{ statsKey === 'track_clonotypes' ? 'Clonotype Tracking' : 'Top Clones' }}
+    </div>
+    
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <c-badge
+      *ngIf="statusBadge"
+      [color]="statusBadge.kind === 'loading-cache' ? 'secondary' : 'info'"
+      class="d-inline-flex align-items-center gap-2"
+      >
+      <c-spinner size="sm" class="me-2"></c-spinner>
+      {{ statusBadge.message }}
+    </c-badge>
+    
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <label class="me-2 mb-0">Repertoire</label>
+      <select
+      cFormSelect
+      style="width:auto"
+      [(ngModel)]="selectedRepertoireKey"
+      (ngModelChange)="onRepertoireChange($event)"
+      [disabled]="statusBadge?.kind === 'computing' || !repertoireOptions.length"
+      >
+      <option
+      *ngFor="let o of repertoireOptions; trackBy: trackByKey"
+      [value]="o.key"
+      >
+      {{ o.label }}
+    </option>
+  </select>
+  
+  <label class="ms-3 me-2 mb-0">Metric</label>
+  <select
+  cFormSelect
+  style="width:auto"
+  [(ngModel)]="metric"
+  (ngModelChange)="onMetricChangeValue($event)"
+  >
+  <option value="prop">Proportion</option>
+  <option value="count">Count</option>
+</select>
+
+<ng-container *ngIf="!trackingOnly">
+  <label class="ms-3 me-2 mb-0">Source</label>
+  <select
+  cFormSelect
+  style="width:auto"
+  [(ngModel)]="statsKey"
+  (ngModelChange)="onStatsKeyValueChange($event)"
+  >
+  <option value="top_clones">Top clones</option>
+  <option value="track_clonotypes">Tracking</option>
+</select>
+</ng-container>
+
+<label class="ms-3 me-2 mb-0">Top N</label>
+<input
+cFormControl
+type="number"
+min="1"
+step="1"
+style="width:6rem"
+[value]="topN"
+(input)="onTopNChange($event)"
+/>
+
+<c-form-check [switch]="true" class="mb-0 ms-3 d-flex align-items-center">
+  <input
+  cFormCheckInput
+  type="checkbox"
+  [(ngModel)]="ignoreCache"
+  (change)="onCacheToggle()"
+  [disabled]="statusBadge?.kind === 'computing'"
+  />
+  <label cFormCheckLabel class="mb-0">Ignore cache</label>
+</c-form-check>
+</div>
+</div>
+</c-card-header>
+
+<c-card-body>
+<!--   <div *ngIf="pinnedKeys.size > 0" class="mb-3 small text-body-secondary">
+    <strong>Pinned clonotypes:</strong>
+    {{ pinnedList.join(', ') }}
+  </div> -->
+  
+  <div *ngIf="trackingOnly || statsKey === 'track_clonotypes'; else barView">
+    <plotly-plot
+    [data]="sankeyTraces"
+    [layout]="sankeyLayout"
+    [config]="config"
+    ></plotly-plot>
+  </div>
+  
+  <ng-template #barView>
+    <plotly-plot
+    [data]="barTraces"
+    [layout]="barLayout"
+    [config]="config"
+    ></plotly-plot>
+  </ng-template>
+  
+    <div class="mt-3 d-flex justify-content-center">
+      <div class="search-toolbar-shell d-flex align-items-center gap-2 flex-wrap">
+        
+        <div class="search-toolbar-chip search-toolbar-chip-input">
+          <input
+          cFormControl
+          type="text"
+          class="search-toolbar-input"
+          placeholder='Search clonotypes…'
+          [(ngModel)]="query"
+          (ngModelChange)="onQueryChange($event)"
+          />
+          
+          <button
+          *ngIf="query.length"
+          cButton
+          color="light"
+          type="button"
+          class="search-toolbar-clear"
+          (click)="clearQuery()"
+          aria-label="Clear search"
+          >
+          ×
+        </button>
+      </div>
+      
+      <div class="search-toolbar-chip">
+        <select
+        cFormSelect
+        class="search-toolbar-select"
+        [(ngModel)]="searchMode"
+        (ngModelChange)="onSearchModeChange($event)"
+        >
+        <option value="highlight">Highlight</option>
+        <option value="filter">Filter</option>
+      </select>
+    </div>
+    
+    <button
+    cButton
+    color="light"
+    type="button"
+    class="search-toolbar-chip search-toolbar-btn"
+    [disabled]="!query.trim()"
+    (click)="pinMatched(topRows)"
+    >
+    Pin matches
+  </button>
+  
+  <button
+  cButton
+  color="light"
+  type="button"
+  class="search-toolbar-chip search-toolbar-btn"
+  [disabled]="pinnedKeys.size === 0"
+  (click)="clearPins()"
+  >
+  Clear pins
+</button>
+
+</div>
+</div>
+</c-card-body>
+</c-card>

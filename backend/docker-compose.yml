@@ -1,0 +1,18 @@
+services:
+  shairr-backend-datasources:
+    build: .  # Points to your local backend folder containing Dockerfile
+    container_name: shairr-backend-datasources
+    restart: always
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+    volumes:
+      # Connect to host's docker instance
+      - /var/run/docker.sock:/var/run/docker.sock
+
+      # Database and file storage locations
+      - ./data/database:/app/data/database
+      - ./data/uploads:/app/data/uploads   # Temporary upload storage
+      - ./data/datasets:/app/data/datasets # Permanent data storage
+      - ./data/airr:/app/data/airr

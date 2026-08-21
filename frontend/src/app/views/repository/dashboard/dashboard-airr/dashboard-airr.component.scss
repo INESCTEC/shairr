@@ -1,0 +1,49 @@
+.repository-airr-card {
+    background-color: var(--cui-body-bg);
+}
+
+.repository-airr-version-badge {
+    border-radius: 999px;
+    font-weight: 600;
+    padding: .45rem .75rem;
+}
+
+.repository-airr-base-url {
+    background-color: var(--cui-tertiary-bg);
+    border: 1px solid var(--cui-border-color);
+    border-radius: .5rem;
+    color: var(--cui-primary);
+    display: block;
+    overflow-x: auto;
+    padding: .75rem;
+    white-space: nowrap;
+}
+
+.repository-airr-simple-list {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+}
+
+.repository-airr-simple-row {
+    align-items: center;
+    background-color: var(--cui-tertiary-bg);
+    border: 1px solid var(--cui-border-color);
+    border-radius: .5rem;
+    display: flex;
+    gap: .75rem;
+    padding: .75rem;
+}
+
+.repository-airr-simple-row code {
+    color: var(--cui-body-color);
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .repository-airr-simple-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

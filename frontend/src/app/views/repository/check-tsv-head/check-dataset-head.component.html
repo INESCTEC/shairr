@@ -1,0 +1,40 @@
+<c-card class="dataset-preview-card">
+    <c-card-body class="dataset-preview-body">
+        <h3 class="mb-3" *ngIf="dataset && dataset.id && dataset.id > 0">
+            {{ dataset.filename || 'Loading...' }}
+        </h3>
+
+        <div class="dataset-metadata" *ngIf="!loading && tableData.length > 0">
+            <span>
+                <strong>Rows Previewed:</strong>
+                {{ tableData.length }}
+            </span>
+
+            <span>
+                <strong>Columns:</strong>
+                {{ columns.length }}
+            </span>
+
+            <span *ngIf="dataset && dataset?.filesize">
+                <strong>Size:</strong>
+                {{ dataset.filesize }}
+            </span>
+        </div>
+
+        <div *ngIf="loading" class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">
+                    Loading...
+                </span>
+            </div>
+        </div>
+
+        <div *ngIf="!loading && showTabulator" class="tabulator-container">
+            <div id="dataset-head"></div>
+        </div>
+
+        <div *ngIf="!loading && !showTabulator && tableData.length === 0" class="empty-state">
+            No data available. This might be an empty file.
+        </div>
+    </c-card-body>
+</c-card>

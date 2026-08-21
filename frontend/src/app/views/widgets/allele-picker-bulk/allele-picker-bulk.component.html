@@ -1,0 +1,118 @@
+<div *ngIf="allelesLoading">
+    <div class="spinner-border spinner-border-sm" role="status">
+        <span class="visually-hidden"></span>
+    </div>
+    Loading alleles from IPD-IMGT/HLA database...
+</div>
+
+<div cRow class="row mb-3 scrub-a87528" id="allele-picker">
+
+    <div *ngIf="disabled" class="disabled-overlay">
+        <div class="disabled-message">
+            <i class="fa fa-lock me-2"></i>
+            Save the subject first to add MHC genotypes later.
+        </div>
+    </div>
+
+    <div [class.fade-content]="disabled" class="scrub-5d97c6">
+        <div class="column scrub-8e0008">
+            <select cSelect id="class" [(ngModel)]="selectedClass" [disabled]="disabled" (change)="loadAlleles()">
+                <option value="" disabled selected>Select an MHC class</option>
+                <option *ngFor="let class of ['Class I', 'Class II']" value="{{class.split(' ')[1]}}">
+                    {{ class }}
+                </option>
+            </select>
+
+            <input type="text" class="form-control scrub-92353e" placeholder="Filter loaded alleles..."
+                [ngModel]="alleleSearchQuery" (ngModelChange)="onAlleleSearch($event)" [disabled]="disabled" />
+
+            <ul cListGroup id="alleleList" class="scrub-1b658c" (scroll)="onScroll($event)">
+                <li cListGroupItem *ngIf="alleleOptions.length == 0" disabled class="scrub-7fd0fd">
+                    No alleles to list.
+                </li>
+                <li cListGroupItem *ngFor="let allele of filteredAlleles; let i = index" class="scrub-741328">
+                    <input type="checkbox" [value]="allele.name" #alleleCheckbox class="scrub-f15522"
+                        [disabled]="disabled" />
+                    <label class="scrub-1e5e83">{{allele.name}}</label>
+                </li>
+            </ul>
+
+            <div class="scrub-dadc45">
+                <label cLabel class="scrub-e38d8d">Name</label>
+                <input cFormControl id="name" type="text" [(ngModel)]="manualAlleleName" [disabled]="disabled"
+                    class="scrub-be70d9" placeholder="Enter allele name" />
+            </div>
+        </div>
+
+        <div class="column scrub-06d6f9">
+            <input cSelect class="form-select ng-untouched ng-pristine ng-valid" class="scrub-26574e" />
+
+            <ul cListGroup class="scrub-f8abac">
+                <li>
+                    <button cButton class="btn-picker scrub-be70d9" (click)="selectAlleles()" [disabled]="disabled">
+                        <i class="fa fa-check scrub-680c05"></i>
+                        <span *ngIf="width > 800">Select</span>
+                    </button>
+                </li>
+                <li>
+                    <button cButton class="btn-picker scrub-be70d9" (click)="clearAlleles()" [disabled]="disabled">
+                        <i class="fa fa-trash scrub-680c05"></i>
+                        <span *ngIf="width > 800">Clear</span>
+                    </button>
+                </li>
+                <li>
+                    <button cButton class="btn-picker scrub-be70d9" *ngIf="manual" (click)="alleleCreator()"
+                        [disabled]="disabled">
+                        <i class="fa fa-plus scrub-680c05"></i>
+                        <span *ngIf="width > 800">Manual</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="column scrub-8e0008">
+            <select cSelect id="species" [(ngModel)]="selectedOrganismGroup" (change)="onOrganismGroupChange()"
+                [disabled]="disabled">
+                <option value="" disabled selected>Select an organism group</option>
+                <option *ngFor="let organism of getFilteredOrganismGroups() | keyvalue" value="{{organism.key}}">
+                    {{ organism.value }}
+                </option>
+            </select>
+
+            <input type="text" class="form-control scrub-92353e" placeholder="Filter selected alleles..."
+                [ngModel]="selectedAlleleSearchQuery" (ngModelChange)="onSelectedAlleleSearch($event)"
+                [disabled]="disabled" />
+
+            <ul cListGroup class="scrub-dad28b">
+
+                <li cListGroupItem *ngIf="selectedAlleles && selectedAlleles.length == 0" disabled class="scrub-f21fb9">
+                    No alleles selected.
+                </li>
+                <ng-container *ngFor="let allele of filteredSelectedAlleles; let i = index">
+                    <div class="allele-tag"
+                        [ngStyle]="{'background-color': getColor(allele.name), 'color': 'white', 'padding': '4px 8px 4px 4px', 'border-radius': '10px', 'height': '28px', 'align-items': 'center', 'display': 'inline-flex', 'margin': '2px', 'gap': '6px'}">
+                        <i *ngIf="!isInWorkspaces()" (click)="!disabled && removeAllele(allele)"
+                            class="fa fa-times scrub-b4b826" [class.disabled]="disabled" [class.opacity-50]="disabled"
+                            title="Remove allele"></i>
+                        <span class="scrub-f74950">{{ allele.name }}</span>
+                        <c-badge [style.background]="'rgba(255,255,255,0.3)'" [style.color]="'white'">
+                            {{ getAlleleCount(allele.name) }}/{{ totalSubjectsCount }}
+                        </c-badge>
+                        <i class="fa fa-plus-circle" (click)="$event.stopPropagation(); !disabled && addAlleleToAllSubjects(allele)"
+                            [class.opacity-50]="disabled" style="cursor: pointer; font-size: 14px;"
+                            title="Add to all subjects"></i>
+                    </div>
+                </ng-container>
+            </ul>
+
+            <div class="scrub-dadc45">
+                <label cLabel class="scrub-e38d8d">MHC Class</label>
+                <select cSelect id="mhc_class" [(ngModel)]="manualAlleleMhcClass" [disabled]="disabled"
+                    class="scrub-be70d9">
+                    <option value="I">Class I</option>
+                    <option value="II">Class II</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>

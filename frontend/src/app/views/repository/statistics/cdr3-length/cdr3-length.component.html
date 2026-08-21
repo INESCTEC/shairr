@@ -1,0 +1,128 @@
+<c-card>
+  <c-card-header class="d-flex justify-content-between align-items-center">
+    <div class="fw-bold">CDR3 Length</div>
+    
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <!-- Status badge -->
+      <c-badge
+        *ngIf="statusBadge"
+        [color]="statusBadge.kind === 'loading-cache' ? 'secondary' : 'info'"
+        class="d-inline-flex align-items-center gap-2"
+      >
+      <c-spinner
+      *ngIf="statusBadge.kind === 'computing'"
+      size="sm"
+      class="me-2"
+      ></c-spinner>
+      {{ statusBadge.message }}
+    </c-badge>
+    
+    <!-- Repertoire selector -->
+    <div class="d-flex align-items-center gap-2">
+      <label class="me-2 mb-0">Repertoire</label>
+      <select
+      cFormSelect
+      style="width:auto"
+      [(ngModel)]="selectedRepertoireKey"
+      (ngModelChange)="onRepertoireChange($event)"
+      >
+      <option value="*">All repertoires</option>
+      <option
+      *ngFor="let o of repertoireOptions"
+      [value]="o.key"
+      >
+      {{ o.label }}
+    </option>
+  </select>
+</div>
+
+<!-- Sample selector -->
+<div class="d-flex align-items-center gap-2">
+  <label class="me-2 mb-0">Sample</label>
+  <select
+  cFormSelect
+  style="width:auto"
+  [(ngModel)]="selectedKey"
+  (ngModelChange)="onSampleChange($event)"
+  [disabled]="statusBadge?.kind === 'computing'"
+  >
+  <option value="*">All samples</option>
+  <option
+  *ngFor="let o of sampleOptions; trackBy: trackByKey"
+  [value]="o.key"
+  >
+  {{ o.label }}
+</option>
+</select>
+</div>
+
+<!-- Ignore cache toggle -->
+<c-form-check
+[switch]="true"
+class="mb-0 d-flex align-items-center"
+>
+<input
+cFormCheckInput
+type="checkbox"
+[(ngModel)]="ignoreCache"
+(change)="onCacheToggle()"
+[disabled]="statusBadge?.kind === 'computing'"
+/>
+<label cFormCheckLabel class="mb-0">
+  Ignore cache
+</label>
+</c-form-check>
+</div>
+</c-card-header>
+
+<c-card-body>
+  <!-- KPI Card -->
+  <c-card class="mb-3 shadow-sm border">
+    <c-card-header class="py-2 bg-body-tertiary fw-semibold">
+      CDR3 length metrics
+    </c-card-header>
+    
+    <c-card-body>
+      <div class="row g-3 row-cols-2 row-cols-md-3">
+        <div class="col">
+          <c-badge color="primary" class="w-100 d-flex justify-content-between">
+            <span>N</span><span>{{ kpi.n }}</span>
+          </c-badge>
+        </div>
+        <div class="col">
+          <c-badge color="info" class="w-100 d-flex justify-content-between">
+            <span>Mean</span><span>{{ kpi.mean }}</span>
+          </c-badge>
+        </div>
+        <div class="col">
+          <c-badge color="success" class="w-100 d-flex justify-content-between">
+            <span>Median</span><span>{{ kpi.median }}</span>
+          </c-badge>
+        </div>
+        <div class="col">
+          <c-badge color="warning" class="w-100 d-flex justify-content-between">
+            <span>IQR</span><span>{{ kpi.q25 }}–{{ kpi.q75 }}</span>
+          </c-badge>
+        </div>
+        <div class="col">
+          <c-badge color="secondary" class="w-100 d-flex justify-content-between">
+            <span>Min</span><span>{{ kpi.min }}</span>
+          </c-badge>
+        </div>
+        <div class="col">
+          <c-badge color="secondary" class="w-100 d-flex justify-content-between">
+            <span>Max</span><span>{{ kpi.max }}</span>
+          </c-badge>
+        </div>
+      </div>
+    </c-card-body>
+  </c-card>
+  
+  <!-- Plot -->
+  <plotly-plot
+  [data]="traces"
+  [layout]="layout"
+  [config]="config"
+  ></plotly-plot>
+</c-card-body>
+</c-card>

@@ -1,0 +1,66 @@
+<c-offcanvas #offcanvas placement="end" id="OffcanvasEnd" class="border-gradient shairr-border"
+  [visible]="offcanvasVisible" (visibleChange)="handleVisibleChange($event)">
+  <c-offcanvas-header>
+    <h5 cOffcanvasTitle>Notifications</h5>
+    <div class="ms-auto d-flex gap-2">
+      <button class="btn btn-sm btn-outline-primary" (click)="toggleReadNotifications()"
+        [title]="showReadNotifications ? 'Hide read notifications' : 'Show all notifications'">
+        <i class="fa" [ngClass]="showReadNotifications ? 'fa-eye-slash' : 'fa-eye'"></i>
+        {{ showReadNotifications ? 'Hide Read' : 'Show All' }}
+      </button>
+    </div>
+  </c-offcanvas-header>
+  <c-offcanvas-body class="p-0">
+    <div *ngIf="loading" class="text-center p-3">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && filteredNotifications.length === 0" class="text-center p-3 text-muted">
+      <i class="fa fa-bell-slash fa-2x mb-2"></i>
+      <p *ngIf="showReadNotifications">No notifications</p>
+      <p *ngIf="!showReadNotifications">No unread notifications</p>
+    </div>
+
+    <div *ngIf="!loading && filteredNotifications.length > 0" class="notifications-scroll-container"
+      class="scrub-d6616a">
+      <div class="scrub-396b53">
+        <div *ngFor="let notification of filteredNotifications" class="mb-2">
+          <div class="toast-custom w-100" [ngStyle]="{
+                 'background': getToastGradient(notification.level), 
+                 'opacity': notification.read ? '0.6' : '1',
+                 'border-radius': '8px',
+                 'overflow': 'hidden',
+                 'box-shadow': '0 12px 28px rgba(0, 0, 0, 0)',
+                 'border': '1px solid rgba(0, 0, 0, 0.08)'
+               }">
+            <div class="border-bottom toast-header-custom p-2 d-flex align-items-center" [ngStyle]="{
+                   'background': 'transparent', 
+                   'border-bottom': '2px solid ' + getToastColor(notification.level)
+                 }">
+              <span class="me-2 d-flex align-items-center justify-content-center"
+                [style.backgroundColor]="getToastColor(notification.level)"
+                class="scrub-f5d6c7">
+                <i class="fa" [ngClass]="getToastIcon(notification.level)" class="scrub-0edc08"></i>
+              </span>
+              <strong [style.color]="getToastColor(notification.level)">{{ notification.title || notification.level
+                }}</strong>
+              <small class="ms-2 text-body-secondary">
+                <span class="fst-italic">({{(notification.timestamp | date:'shortDate') === (today | date:'shortDate') ? (notification.timestamp | date:'shortTime') : (notification.timestamp | date:'short') }})</span>
+              </small>
+              <i class="fa fa-eye ms-auto text-primary" *ngIf="!notification.read" (click)="markAsRead(notification.id)"
+                class="scrub-babbaf"></i>
+              <span class="ms-auto text-muted small" *ngIf="notification.read">
+                <i class="fa fa-check me-1"></i>Read
+              </span>
+            </div>
+            <div class="p-2" [ngStyle]="{'background': 'transparent'}">
+              {{ notification.message }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </c-offcanvas-body>
+</c-offcanvas>

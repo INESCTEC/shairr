@@ -1,0 +1,58 @@
+<c-card class="repository-airr-card mb-4">
+    <c-card-header class="bg-body d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="mb-1">AIRR API URLs</h4>
+
+            <p class="text-body-secondary mb-0 small">
+                Standard AIRR API endpoints exposed by ShAIRR.
+            </p>
+        </div>
+
+        <c-badge color="info" class="repository-airr-version-badge">
+            AIRR v1
+        </c-badge>
+    </c-card-header>
+
+    <c-card-body>
+        <div class="mb-3">
+            <label class="form-label text-body-secondary small mb-1">
+                Base URL
+            </label>
+
+            <code class="repository-airr-base-url">
+                {{ shairrApiUrl }}{{ baseUri.v1 }}
+            </code>
+        </div>
+
+        <div class="repository-airr-simple-list">
+            <div class="repository-airr-simple-row">
+                <c-badge color="success">GET</c-badge>
+
+                <code>
+                    {{ shairrApiUrl }}{{ baseUri.v1 }}/repertoire/id
+                </code>
+            </div>
+            <div class="repository-airr-simple-row">
+                <c-badge color="primary">POST</c-badge>
+
+                <code>
+                    {{ shairrApiUrl }}{{ baseUri.v1 }}/repertoire
+                </code>
+            </div>
+            <div class="repository-airr-simple-row">
+                <c-badge color="success">GET</c-badge>
+
+                <code>
+                    {{ shairrApiUrl }}{{ baseUri.v1 }}/rearrangement/id
+                </code>
+            </div>
+            <div class="repository-airr-simple-row">
+                <c-badge color="primary">POST</c-badge>
+
+                <code>
+                    {{ shairrApiUrl }}{{ baseUri.v1 }}/rearrangement
+                </code>
+            </div>
+        </div>
+    </c-card-body>
+</c-card>

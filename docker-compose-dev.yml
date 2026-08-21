@@ -1,0 +1,68 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: /Dockerfile.dev
+    container_name: shairr-frontend-dev
+    ports:
+      - 4200:4200
+    command: ng serve --host 0.0.0.0 --port 4200
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    container_name: shairr-backend
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app
+      - ${SHARED_DATA_HOST_PATH:-/shared}:${SHARED_DATA_ROOT:-/shared}
+      - /var/run/docker.sock:/var/run/docker.sock  # Mount Docker socket for Nextflow/Docker
+      - /tmp:/tmp  # For temporary files
+    environment:
+      PYTHONUNBUFFERED: 1
+      SHARED_DATA_ROOT: ${SHARED_DATA_ROOT:-/shared}
+      SHARED_DATA_HOST_PATH: ${SHARED_DATA_HOST_PATH:-/shared}
+      DATABASE_URL: sqlite:////data/tasks.db
+
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:26.0.6
+    ports:
+      - 8080:8080
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://keycloak_db:5432/keycloak
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=keycloak
+      - KC_PROXY=edge
+      - KC_HTTP_RELATIVE_PATH=/auth
+    depends_on:
+      - keycloak_db
+    volumes:
+      - ./keycloak/import:/opt/keycloak/data/import
+    command:
+      - start-dev
+      - --import-realm
+
+  keycloak_db:
+    image: postgres:16
+    volumes:
+      - keycloak_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+
+volumes:
+  keycloak_data:

@@ -1,0 +1,38 @@
+<c-modal [visible]="visible$ | async" (visibleChange)="onVisibleChange($event)" alignment="top">
+    <ng-container *ngIf="config$ | async as config">
+        <c-modal-body class="p-0" [ngStyle]="{'background': getGradient(config)}">
+            <div class="modal-content-wrapper">
+                <ng-container *ngIf="config.type === 'confirm'">
+                    <div class="d-flex justify-content-between align-items-center p-3">
+                        <div class="d-flex align-items-center">
+                            <span class="me-2 d-flex align-items-center justify-content-center icon-square" 
+                                  [style.backgroundColor]="getBorderColor(config)">
+                                <i [class]="getIconClass(config)" class="scrub-bc4c70"></i>
+                            </span>
+                            <h5 [style.color]="getTitleColor(config)" class="mb-0">{{ config.title }}</h5>
+                        </div>
+                        <i class="fa fa-times close-icon" (click)="onCancel()"></i>
+                    </div>
+                    <div class="border-bottom" class="scrub-9c0edd"></div>
+                </ng-container>
+
+                <div class="p-3">
+                    <div class="modal-message" class="scrub-650b5f">{{ config.message }}</div>
+                </div>
+
+                <ng-container *ngIf="config.type === 'confirm'">
+                    <div class="border-bottom" class="scrub-9c0edd"></div>
+                </ng-container>
+                
+                <div class="p-3 d-flex justify-content-end">
+                    <button *ngIf="config.type === 'confirm'" cButton color="secondary" (click)="onCancel()" class="me-2">
+                        {{ config.cancelText || 'Cancel' }}
+                    </button>
+                    <button cButton (click)="onConfirm()" [ngStyle]="{'background-color': getBorderColor(config), 'border-color': getBorderColor(config)}" class="scrub-b371fd">
+                        {{ config.confirmText || 'OK' }}
+                    </button>
+                </div>
+            </div>
+        </c-modal-body>
+    </ng-container>
+</c-modal>

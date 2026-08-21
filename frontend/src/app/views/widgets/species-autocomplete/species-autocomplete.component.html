@@ -1,0 +1,107 @@
+<div class="species-autocomplete row scrub-b70159">
+
+  <div class="input-group scrub-b70159">
+    <input
+      type="text"
+      class="form-control"
+      [placeholder]="placeholder"
+      [formControl]="searchControl"
+      [disabled]="disabled"
+      (blur)="onInputBlur()"
+      (focus)="onInputFocus()"
+      autocomplete="off">
+
+    <button
+      *ngIf="!searchControl.value"
+      class="btn btn-outline-primary"
+      type="button"
+      (click)="showCommon()"
+      [disabled]="disabled"
+      title="Show common species">
+      <i class="fa fa-list"></i>
+    </button>
+    
+    <button
+      *ngIf="searchControl.value && !isLoading"
+      class="btn btn-outline-primary"
+      type="button"
+      (click)="clearSelection()"
+      [disabled]="disabled">
+      <i class="fa fa-times"></i>
+    </button>
+    
+    <div *ngIf="isLoading" class="input-group-text">
+      <div class="spinner-border spinner-border-sm" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+
+  <div *ngIf="showDropdown && (filteredOptions.length > 0 || showCommonSpecies || isLoading)" 
+       class="dropdown-menu show w-100 scrub-1f9bff">
+    
+
+    <div *ngIf="showCommonSpecies" class="dropdown-header">
+      Common Species
+    </div>
+    
+
+    <div *ngIf="isLoading" class="dropdown-item">
+      <div class="d-flex align-items-center">
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <span class="text-muted">Searching species...</span>
+      </div>
+    </div>
+    
+    <a *ngFor="let option of filteredOptions" 
+       href="javascript:void(0)" 
+       class="dropdown-item" 
+       (click)="onSelectOption(option)"
+       [class.active]="selectedTerm?.id === option.id">
+      
+      <div class="species-option">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="species-label fw-semibold">{{ option.label }}</span>
+          <span *ngIf="showRank && option.rank" class="species-rank badge bg-secondary">
+            {{ option.rank }}
+          </span>
+        </div>
+        
+        <div *ngIf="showId" class="species-id small text-muted">
+          <code>{{ option.id }}</code>
+        </div>
+        
+        <div *ngIf="option.common_name" class="species-common-name small text-muted">
+          <span class="fst-italic">Common name:</span> {{ option.common_name }}
+        </div>
+        
+        <div *ngIf="option.synonyms?.length" class="species-synonyms small text-muted">
+          <span class="fst-italic">Also known as:</span> 
+          {{ option.synonyms.slice(0, 2).join(', ') }}
+          <span *ngIf="option.synonyms.length > 2" class="text-muted">...</span>
+        </div>
+      </div>
+    </a>
+    
+    <div *ngIf="!isLoading && filteredOptions.length === 0 && searchControl.value && searchControl.value.length >= 2" 
+         class="dropdown-item text-muted">
+      <i class="cil-warning me-1"></i>
+      No species found for "{{ searchControl.value }}"
+    </div>
+    
+    <div *ngIf="!isLoading && showCommonSpecies && commonSpecies.length === 0" 
+         class="dropdown-item text-muted">
+      <i class="cil-info me-1"></i>
+      No common species available
+    </div>
+  </div>
+
+  <div *ngIf="selectedTerm" class="form-text mt-1 scrub-b70159">
+    <small class="text-success">
+      <i class="fa fa-check-circle me-1"></i>
+      Selected: <strong>{{ selectedTerm.label + ' ' }}</strong> <span *ngIf="showId">({{ selectedTerm.id }})</span>
+      <span *ngIf="selectedTerm.rank"> - {{ selectedTerm.rank }}</span>
+    </small>
+  </div>
+</div>

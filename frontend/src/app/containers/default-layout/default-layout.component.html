@@ -1,0 +1,18 @@
+<div class="wrapper d-flex flex-column min-vh-100 bg-light dark:bg-transparent">
+    <app-default-header [routeData]="routeData" class="mb-3 d-print-none header header-sticky" position="sticky"
+        sidebarId="sidebar">
+    </app-default-header>
+
+    <div class="body flex-grow-1 px-3">
+        <c-container class="h-auto" [fluid]="true">
+            <router-outlet></router-outlet>
+        </c-container>
+    </div>
+    <app-default-footer></app-default-footer>
+
+    <app-widgets-toast #toast></app-widgets-toast>
+</div>
+
+
+
+<app-default-notifications></app-default-notifications>

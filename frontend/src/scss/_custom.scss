@@ -1,0 +1,54 @@
+.header {
+    padding: 0 !important;
+}
+
+.footer {
+    display: block;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.toast {
+    --cui-toast-border-width: 0px;
+}
+
+.indent {
+    padding-left: 10px;
+}
+
+.multiselect-dropdown .dropdown-btn {
+    border-radius: 0 !important;
+    border: $input-border-width solid $input-border-color !important;
+
+    .selected-item {
+        font-size: 0.7em;
+        padding: 0;
+
+        a {
+            margin-left: 5px;
+        }
+    }
+}
+
+.badge-mhc {
+    filter: saturate(1.6);
+}
+
+.tabulator {
+    border-radius: $border-radius;
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.airr-small-icon {
+    width: 2rem;
+}
+
+.btn-light {
+    border: 1px solid var(--cui-border-color);
+}

@@ -1,0 +1,90 @@
+<c-card>
+  <c-card-header class="d-flex justify-content-between align-items-center">
+    <div class="fw-bold">{{ kind }} Gene Usage</div>
+    
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <c-badge
+      *ngIf="statusBadge"
+      [color]="statusBadge.kind === 'loading-cache' ? 'secondary' : 'info'"
+      class="d-inline-flex align-items-center gap-2"
+      >
+      <c-spinner
+      *ngIf="statusBadge.kind === 'computing'"
+      size="sm"
+      class="me-2"
+      ></c-spinner>
+      {{ statusBadge.message }}
+    </c-badge>
+    
+    <div class="d-flex align-items-center gap-2">
+      <label class="me-2 mb-0">Repertoire</label>
+      <select
+      cFormSelect
+      style="width:auto"
+      [(ngModel)]="selectedRepertoireKey"
+      (ngModelChange)="onRepertoireChange($event)"
+      >
+      <option value="*">All repertoires</option>
+      <option *ngFor="let o of repertoireOptions" [value]="o.key">
+        {{ o.label }}
+      </option>
+    </select>
+  </div>
+  
+  <div class="d-flex align-items-center gap-2">
+    <label class="me-2 mb-0">Sample</label>
+    <select
+    cFormSelect
+    style="width:auto"
+    [(ngModel)]="selectedKey"
+    (ngModelChange)="onSampleChange($event)"
+    [disabled]="statusBadge?.kind === 'computing'"
+    >
+    <option value="*">All samples</option>
+    <option *ngFor="let o of sampleOptions; trackBy: trackByKey" [value]="o.key">
+      {{ o.label || o.key }}
+    </option>
+  </select>
+</div>
+
+<div class="d-flex align-items-center gap-2 flex-wrap">
+  <label class="me-2 mb-0">View</label>
+  <select cFormSelect style="width:auto" (change)="onViewChange($event)">
+    <option value="mean" [selected]="view === 'mean'">Mean</option>
+    <option value="stacked" [selected]="view === 'stacked'">Stacked</option>
+  </select>
+  
+  <label class="ms-3 me-2 mb-0">Top K</label>
+  <input
+  cFormControl
+  type="number"
+  min="1"
+  step="1"
+  style="width:6rem"
+  [value]="topK"
+  (input)="onTopKChange($event)"
+  />
+  
+  <c-form-check [switch]="true" class="mb-0 ms-3 d-flex align-items-center">
+    <input
+    cFormCheckInput
+    type="checkbox"
+    [(ngModel)]="ignoreCache"
+    (change)="onCacheToggle()"
+    [disabled]="statusBadge?.kind === 'computing'"
+    />
+    <label cFormCheckLabel class="mb-0">Ignore cache</label>
+  </c-form-check>
+</div>
+</div>
+</c-card-header>
+
+<c-card-body>
+  <plotly-plot
+  [data]="traces"
+  [layout]="layout"
+  [config]="config"
+  >
+</plotly-plot>
+</c-card-body>
+</c-card>

@@ -1,0 +1,72 @@
+<div class="disease-autocomplete position-relative">
+  <div class="input-group">
+    <input
+      type="text"
+      class="form-control scrub-2b2369"
+      [class.is-invalid]="false"
+      [placeholder]="placeholder"
+      [formControl]="searchControl"
+      [disabled]="disabled"
+      (blur)="onInputBlur()"
+      (focus)="onInputFocus()"
+      autocomplete="off"
+      [style.color]="selectedTerm ? 'green' : ''">
+    
+    <button
+      *ngIf="searchControl.value"
+      class="btn btn-outline-primary"
+      type="button"
+      (click)="clearSelection()"
+      [disabled]="disabled">
+      <i class="fa fa-times"></i>
+    </button>
+    
+    <div *ngIf="isLoading" class="input-group-text">
+      <div class="spinner-border spinner-border-sm" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showDropdown && (filteredOptions.length > 0 || isLoading)" 
+       class="dropdown-menu show w-100 scrub-0ef836">
+    
+    <div *ngIf="isLoading" class="dropdown-item">
+      <div class="d-flex align-items-center">
+        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+        <span class="text-muted">Searching diseases...</span>
+      </div>
+    </div>
+    
+    <a *ngFor="let option of filteredOptions" 
+       href="javascript:void(0)" 
+       class="dropdown-item" 
+       (click)="onSelectOption(option)"
+       [class.active]="selectedTerm?.id === option.id">
+      
+      <div class="disease-option">
+        <div class="disease-label fw-semibold">{{ option.label }}</div>
+        
+        <div *ngIf="showId" class="disease-id small text-muted">
+          <code>{{ option.id }}</code>
+        </div>
+        
+        <div *ngIf="option.synonyms?.length" class="disease-synonyms small text-muted">
+          <span class="fst-italic">Also known as:</span> 
+          {{ option.synonyms.slice(0, 2).join(', ') }}
+          <span *ngIf="option.synonyms.length > 2" class="text-muted">...</span>
+        </div>
+        
+        <div *ngIf="option.definition" class="disease-definition small text-muted mt-1">
+          {{ (option.definition.length > 100) ? (option.definition | slice:0:100) + '...' : option.definition }}
+        </div>
+      </div>
+    </a>
+    
+    <div *ngIf="!isLoading && filteredOptions.length === 0 && searchControl.value && searchControl.value.length >= 2"
+         class="dropdown-item text-muted">
+      <i class="fa-warning me-1"></i>
+      No diseases found for "{{ searchControl.value }}"
+    </div>
+  </div>
+</div>

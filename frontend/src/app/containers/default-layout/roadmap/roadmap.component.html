@@ -1,0 +1,18 @@
+<c-container [fluid]="true" class="d-flex align-items-center flex-nowrap gap-2">
+    <a class="d-inline-flex align-items-center text-decoration-none pointer active home" routerLink="/">
+        <span class="d-inline-flex align-items-center">
+            <i class="fa fa-home fa-2x"></i>
+        </span>
+    </a>
+
+
+    <ng-container *ngFor="let stone of milestones; first as isFirst">
+        <a *ngIf="stone.active" class="d-inline-flex align-items-center text-decoration-none pointer"
+            routerLink="{{ stone.link }}" [ngClass]="{ active: stone.active }">
+            <i class="arrow fa fa-chevron-right"></i>
+            <span class="d-inline-flex align-items-center">
+                {{ stone.name }}
+            </span>
+        </a>
+    </ng-container>
+</c-container>

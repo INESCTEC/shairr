@@ -1,0 +1,98 @@
+<div *ngIf="loading" class="timeline-loading">
+  <i class="spinner-grow spinner-grow-sm"></i>
+  <span class="m-1">Loading timeline...</span>
+</div>
+
+<div *ngIf="!loading && timepoints.length == 0" class="timeline-empty">
+  <span class="text-muted">This subject has no defined timepoints.</span>
+  <span>
+    <i class="fa fa-plus" (click)="addTimepoint()"></i>
+  </span>
+</div>
+
+<div 
+  *ngIf="!loading && timepoints.length != 0" 
+  class="timeline-container" 
+  #timelineContainer
+  (wheel)="onWheel($event)"
+  (mousedown)="onMouseDown($event)"
+  (mousemove)="onMouseMove($event)"
+  (mouseup)="onMouseUp($event)"
+  (mouseleave)="onMouseUp($event)"
+  [class.dragging]="isDragging"
+>
+  <div class="timeline">
+    <ng-container *ngFor="let timepoint of displayTimepoints; let isLast = last">
+      <div class="timeline-card-wrapper" [attr.data-timepoint-id]="timepoint.id">
+        <c-card 
+          class="timeline-card" 
+          [ngClass]="{'current-sample-timepoint': mode === 'sample' && currentTimepointId === timepoint.id}"
+          (mousedown)="onCardMouseDown($event, timepoint)"
+        >
+          <c-card-header class="timeline-card-header">
+            <span class="timeline-description selectable-text">
+              <strong *ngIf="!editMode[timepoint.id]">{{ timepoint.description }}</strong>
+              <input *ngIf="editMode[timepoint.id]" [(ngModel)]="timepoint.description" type="text" class="timeline-description-input" (mousedown)="$event.stopPropagation()" />
+            </span>
+            <div class="timeline-actions">
+              <ng-container *ngIf="!editMode[timepoint.id]">
+                <button cButton class="btn-edit" (click)="editModeToggle(timepoint.id)" (mousedown)="$event.stopPropagation()">
+                  <i class="fa fa-edit"></i> Edit
+                </button>
+              </ng-container>
+              <ng-container *ngIf="editMode[timepoint.id]">
+                <button cButton class="btn-save" (click)="saveTimepoint(timepoint); editModeToggle(timepoint.id)" (mousedown)="$event.stopPropagation()">
+                  <i class="fa fa-save"></i> Save
+                </button>
+              </ng-container>
+              <button cButton class="btn-delete" (click)="deleteTimepoint(timepoint.id)" (mousedown)="$event.stopPropagation()">
+                <i class="fa fa-trash"></i> Delete
+              </button>
+              <button *ngIf="mode === 'sample' && currentTimepointId !== timepoint.id" class="btn-assign" (click)="assignToSample(timepoint.id)" (mousedown)="$event.stopPropagation()">
+                <i class="fa fa-link"></i> Assign Sample
+              </button>
+              <button *ngIf="mode === 'sample' && currentTimepointId === timepoint.id" class="btn-current" (click)="unassignToSample(timepoint.id)" (mousedown)="$event.stopPropagation()">
+                <i class="fa fa-check"></i> Current
+              </button>
+            </div>
+          </c-card-header>
+          <c-card-body class="timeline-card-body">
+            <table class="timeline-table">
+              <tr *ngIf="editMode[timepoint.id]">
+                <td class="label"><strong>Subject:</strong>
+                <td>
+                  <select [(ngModel)]="timepoint.id_subject" class="form-select form-select-sm" (mousedown)="$event.stopPropagation()">
+                    <option *ngFor="let subj of subjects" [ngValue]="subj.id">{{ subj.subject_id }}</option>
+                  </select>
+                </td>
+              </tr>
+              <tr *ngIf="!editMode[timepoint.id]">
+                <td class="label"><strong>Relative Timepoint:</strong>
+                <td class="selectable-text">{{ timepoint.id_relative_time_point == null ? 'N/A' : timepoint.id_relative_time_point }}</td>
+              </tr>
+              <tr *ngIf="editMode[timepoint.id]">
+                <td class="label"><strong>Relative Timepoint:</strong>
+                <td>
+                  <input [(ngModel)]="timepoint.id_relative_time_point" type="number" step="1" class="form-control form-control-sm" (mousedown)="$event.stopPropagation()" />
+                </td>
+              </tr>
+              <tr *ngIf="!editMode[timepoint.id]">
+                <td class="label"><strong>Time Point:</strong>
+                <td class="selectable-text">{{ timepoint.time_point }} {{ timepoint.units_of_measurement }}</td>
+              </tr>
+              <tr *ngIf="editMode[timepoint.id]">
+                <td class="label"><strong>Time Point:</strong>
+                <td class="timepoint-input-group">
+                  <input [(ngModel)]="timepoint.time_point" type="number" class="form-control form-control-sm" (mousedown)="$event.stopPropagation()" />
+                  <input [(ngModel)]="timepoint.units_of_measurement" type="text" class="form-control form-control-sm" (mousedown)="$event.stopPropagation()" />
+                </td>
+              </tr>
+            </table>
+          </c-card-body>
+        </c-card>
+        <i *ngIf="!isLast" class="fa fa-arrow-right timeline-arrow"></i>
+      </div>
+    </ng-container>
+    <i class="{{isEditModeOn() ? 'fa fa-plus timeline-add-icon disabled' : 'fa fa-plus timeline-add-icon'}}" (click)="addTimepoint()" (mousedown)="$event.stopPropagation()"></i>
+  </div>
+</div>

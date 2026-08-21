@@ -1,0 +1,23 @@
+<div class="bg-light min-vh-100 d-flex flex-row align-items-center">
+    <c-container>
+        <c-row class="justify-content-center">
+            <c-col md="6">
+                <div class="clearfix">
+                    <h1 class="float-start display-3 me-4">401</h1>
+                    <h4 class="pt-3">Unauthorized</h4>
+                    <div class="text-medium-emphasis float-start">
+                        Sorry, you do not have permission to view this page.
+                        <div *ngIf="unauthorized">
+                            Server responded with:
+                            {{ unauthorized.message }}
+                        </div>
+                    </div>
+                </div>
+                <c-input-group class="input-prepend">
+                    <button cButton type="button" class="m-2" color="primary" routerLink="/">Back to Homepage</button>
+                    <button cButton type="button" class="m-2" color="primary" (click)="clearSession()">Try clearing current session</button>
+                </c-input-group>
+            </c-col>
+        </c-row>
+    </c-container>
+</div>

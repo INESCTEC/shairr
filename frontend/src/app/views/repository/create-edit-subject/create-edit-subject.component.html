@@ -1,0 +1,275 @@
+<c-card>
+  <c-accordion>
+    <c-accordion-item #item0="cAccordionItem">
+      <ng-template cTemplateId="accordionHeaderTemplate">
+        <c-card-header (click)="item0.toggleItem()" [collapsed]="!item0.visible" cAccordionButton>
+          <c-row class="scrub-1907e3">
+            <span cCol>
+              <strong>{{ router.url.includes('edit') ? 'Edit' : 'Create' }} Subject {{ subject && subject.subject_id ?
+                subject.subject_id : ''}}</strong>
+            </span>
+          </c-row>
+        </c-card-header>
+      </ng-template>
+
+      <c-card-body *ngIf="!loading && subject">
+        <form cForm [name]="subjectForm" #subjectForm="ngForm" class="mb-3">
+          <c-row class="p-3" class="scrub-626a3d">
+            <div cRow class="mb-3" *ngIf="!savedSubject">
+              <c-alert *ngIf="showAlert()" color="danger" id="form-alert">
+              </c-alert>
+            </div>
+
+            <div cRow class="mb-3" *ngIf="!savedSubject">
+              <label cLabel for="selectSubjectIdStudy">ID Study</label>
+              <select cFormControl id="selectSubjectIdStudy" class="form-select" placeholder="Subject Identifier"
+                [(ngModel)]="subject.id_study" name="subjectStudyId" required autofocus>
+                <option *ngFor="let study of studies" [ngValue]="study.id">{{ study.study_title }}
+                </option>
+              </select>
+              <div cFormText>
+                Associated study for the subject (required).
+              </div>
+            </div>
+
+            <div cRow class="mb-3" *ngIf="!savedSubject">
+              <label cLabel for="inputRepertoireSubjectId">Subject ID</label>
+              <div class="input-group" style="padding: 0px;">
+                <input cFormControl id="inputRepertoireSubjectId" type="text" class="form-control"
+                  placeholder="Subject Identifier" [(ngModel)]="subject.subject_id" name="subjectId" required
+                  autofocus />
+                <button cButton class="btn btn-primary" type="button" (click)="generateSubjectId()">
+                  Generate
+                </button>
+              </div>
+              <div cFormText>
+                Unique identifier for the subject.
+              </div>
+            </div>
+
+            <div cRow class="mb-3" *ngIf="!savedSubject">
+              <label class="form-label" for="inputRepertoireSubjectSynthetic">Synthetic</label>
+              <c-button-group name="inputRepertoireSubjectSynthetic" cRow aria-label="Basic radio toggle button group"
+                role="group" class="scrub-5f79ed">
+                <input class="btn-check" id="organicRadio" type="radio" name="syntheticRadio" value="false"
+                  [checked]="!subject.synthetic" (change)="setRadioValue('false')" />
+                <label cButton cFormCheckLabel variant="outline" for="organicRadio">
+                  Organic
+                </label>
+                <input class="btn-check" id="syntheticRadio" type="radio" name="syntheticRadio" value="true"
+                  [checked]="subject.synthetic" (change)="setRadioValue('true')" />
+                <label cButton cFormCheckLabel variant="outline" for="syntheticRadio">
+                  Synthetic
+                </label>
+              </c-button-group>
+              <div cFormText>
+                Boolean indicating whether the subject is synthetic.
+              </div>
+            </div>
+
+            <div class="row mb-3 scrub-edac83" *ngIf="!savedSubject">
+              <label class="form-label">Diagnosis</label>
+              <div class="diagnosis-container" class="scrub-1cf32e">
+                <div *ngIf="subject.diagnosis && subject.diagnosis.length === 0" class="text-muted mb-2">
+                  No diagnosis entries.
+                  <button type="button" class="btn btn-primary scrub-265908" variant="outline" (click)="addDiagnosis()">
+                    <i class="fa fa-plus"></i> Add Diagnosis
+                  </button>
+                </div>
+                <div *ngFor="let diagnosis of subject.diagnosis; let i = index; trackBy: trackByDiagnosisId"
+                  class="diagnosis-row scrub-d54501">
+                  <div class="diagnosis-field">
+                    <label *ngIf="i === 0" class="form-label small">Disease Diagnosis</label>
+                    <app-disease-autocomplete [placeholder]="'Search disease (min 2 characters)...'" [size]="'sm'"
+                      [showId]="true" [initialValue]="diagnosis.disease_diagnosis"
+                      [displayText]="getDiseaseDisplayText(diagnosis.disease_diagnosis)"
+                      (diseaseSelected)="onDiseaseSelected($event, i)">
+                    </app-disease-autocomplete>
+                    <input type="hidden" [id]="'inputRepertoireSubjectDiagnosisLabel' + i"
+                      [value]="diagnosis.disease_diagnosis.label || ''" />
+                    <input type="hidden" [id]="'inputRepertoireSubjectDiagnosisId' + i"
+                      [value]="diagnosis.disease_diagnosis.id || ''" />
+                  </div>
+                  <div class="diagnosis-field">
+                    <label *ngIf="i === 0" class="form-label small">Disease Stage</label>
+                    <input cFormControl [id]="'inputRepertoireDiagnosisDiseaseStage' + i" class="form-control"
+                      [(ngModel)]="diagnosis.disease_stage" [name]="'repertoireDiagnosisDiseaseStage' + i"
+                      placeholder="Disease Stage" />
+                  </div>
+                  <div class="diagnosis-field">
+                    <label *ngIf="i === 0" class="form-label small">Immunogen</label>
+                    <input cFormControl [id]="'inputRepertoireDiagnosisImmunogen' + i" class="form-control"
+                      [(ngModel)]="diagnosis.immunogen" [name]="'repertoireDiagnosisImmunogen' + i"
+                      placeholder="Immunogen (optional)" />
+                  </div>
+                  <div class="diagnosis-actions">
+                    <label *ngIf="i === 0" class="form-label small">Actions</label>
+                    <div class="scrub-b06399">
+                      <button type="button" class="btn btn-link p-0 border-0" (click)="removeDiagnosis(diagnosis.id)"
+                        [style.color]="subject.diagnosis.length === 1 ? 'gray' : '#e55353'"
+                        [style.cursor]="subject.diagnosis.length === 1 ? 'not-allowed' : 'pointer'">
+                        <i class="fa fa-times"></i>
+                      </button>
+                      <button type="button" class="btn btn-link p-0 border-0" (click)="addDiagnosis()"
+                        class="scrub-ac1f18">
+                        <i class="fa fa-plus"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div cFormText>
+                Input the diagnosis information for the subject. You can add or remove diagnosis entries as needed.
+              </div>
+            </div>
+
+            <div cRow class="mb-3" *ngIf="!savedSubject">
+              <label cLabel for="inputRepertoireSubjectSpecies">Species</label>
+              <app-species-autocomplete [placeholder]="'Search species (min 2 characters)...'" [showId]="true"
+                [showRank]="true" (speciesSelected)="onSpeciesSelected($event)">
+              </app-species-autocomplete>
+              <div cFormText>
+                Input the species of the subject (label and ontology identifier).
+              </div>
+            </div>
+
+            <div cRow class="mb-3" *ngIf="savedSubject || !isCreate()">
+              <label cLabel for="allelePicker">MHC Alleles</label>
+              <app-allele-picker #allelePicker (alleleChange)="onMhcChange($event)"
+                [organismGroup]="selectedOrganismGroupForAllelePicker" (alleleRemove)="removeAllele($event)"
+                (manualAlleleAdd)="manualAdd($event)" [alleles]="mhc_genotype_list">
+              </app-allele-picker>
+              <div cFormText>
+                Subject alleles for the study.
+              </div>
+            </div>
+          </c-row>
+        </form>
+      </c-card-body>
+
+
+
+      <c-card-footer class="card-footer" *ngIf="showSubjectForm">
+        <button cButton class="btn btn-primary" [disabled]="isSaveDisabled" (click)="saveSubject(true)">
+          {{ savedSubject && isCreate() ? 'Finish' : (!savedSubject && isCreate() ? 'Next' : 'Save') }}
+        </button>
+
+      </c-card-footer>
+    </c-accordion-item>
+  </c-accordion>
+</c-card>
+
+
+
+
+
+<span cCol class="scrub-ce4f1a">
+  <input id="input-import-samples-csv" accept=".csv" type="file" class="scrub-9c7663" />
+</span>
+
+<c-card class="scrub-a3161d" *ngIf="!loading && subject && router.url.includes('edit')">
+  <c-card-header class="scrub-de8bee">
+    <strong>Associated Samples</strong>
+  </c-card-header>
+
+  <c-card-body>
+    <div cRow class="p-3" class="scrub-b8c938">
+      <input cFormControl type="text" class="form-control" placeholder="Filter information below." name="subjectFilter"
+        id="filter-input" [(ngModel)]="filterInput" />
+      <select cFormControl class="form-select scrub-7731bc" id="filter-select" [(ngModel)]="selectedFilter">
+        <option
+          *ngFor="let sampleFilters of ['Sample ID', 'Sample Type', 'Tissue', 'Cell Subset', 'Cell Phenotype', 'Sequencing Type']"
+          [value]="sampleFilters" class="scrub-8d5c4f">
+          {{ sampleFilters }}
+        </option>
+      </select>
+      <button cButton color="primary" class="scrub-7731bc" (click)="addFilter()">
+        Add Filter
+      </button>
+      <button cButton color="primary" variant="outline" class="scrub-7731bc" (click)="resetFilters()">
+        Reset
+      </button>
+    </div>
+    <div cRow class="p-3" *ngIf="filters.length > 0" class="scrub-8e49db">
+      <strong cRow>Active Filters:</strong>
+      <div class="scrub-67670a">
+        <c-badge *ngFor="let filter of filters" color="success" class="scrub-7c61a8">
+          {{ filter[0] }}: {{ filter[1] }}
+          <i class="fa fa-times ms-1 scrub-5f2b2a" (click)="removeFilter(filter)"></i>
+        </c-badge>
+      </div>
+    </div>
+    <table cTable hover>
+      <thead cTableColor="light">
+        <th scope="col">ID</th>
+        <th scope="col">Sample ID</th>
+        <th scope="col">Sample Type</th>
+        <th scope="col">Tissue</th>
+        <th scope="col">Cell Subset</th>
+        <th scope="col">Cell Phenotype</th>
+        <th scope="col">Sequencing Type</th>
+        <th scope="col" class="scrub-ce4f1a">
+          <button cButton class="btn btn-primary" (click)="goToSampleCreate(subject.id); $event.stopPropagation()"
+            class="scrub-4aa082">
+            <i class="fa fa-plus"></i> Add Sample
+          </button>
+          <button cButton class="btn btn-primary" (click)="importSamplesCSV(); $event.stopPropagation()"
+            class="scrub-558a5e">
+            <i class="fa fa-plus"></i> Import Samples CSV
+          </button>
+        </th>
+      </thead>
+      <tbody *ngIf="getFilteredAssociatedSamples(subject.id).length != 0" cTableColor="light">
+        <tr *ngFor="let sample of getFilteredAssociatedSamples(subject.id)" (click)="goToSampleEdit(sample.id)"
+          cTableColor="light" class="scrub-265908">
+          <td>{{ sample.id }}</td> <!--TODO: remove? -->
+          <td>{{ sample.sample_id }}</td>
+          <td> @if (sample.sample_type && sample.sample_type != '') {
+            {{ sample.sample_type }}
+            } @else {
+            N/A
+            }</td>
+          <td>
+            @if (hasValidTissue(sample)) {
+            {{ sample.tissue?.label }} ({{ sample.tissue?.id }})
+            } @else {
+            N/A
+            }
+          </td>
+          <td>
+            @if (hasValidCellSubset(sample)) {
+            {{ sample.cell_subset?.label }} ({{ sample.cell_subset?.id }})
+            } @else {
+            N/A
+            }
+          </td>
+          <td> @if (sample.cell_phenotype && sample.cell_phenotype != '') {
+            {{ sample.cell_phenotype }}
+            } @else {
+            N/A
+            }</td>
+          <td colspan="2">{{ sample.sequencing_type }}</td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="getFilteredAssociatedSamples(subject.id).length == 0">
+        <tr>
+          <td colspan="8" class="scrub-7023da">
+            No samples found for this subject with the applied filters.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </c-card-body>
+</c-card>
+
+<c-card class="scrub-a3161d" *ngIf="!loading && subject && router.url.includes('edit')">
+  <c-card-header>
+    <strong>Subject Timeline</strong>
+  </c-card-header>
+  <c-card-body>
+    <app-timeline-editor [subjectId]="subject.id" [sampleId]="null" [currentTimepointId]="null" [subjects]="subjects"
+      [samples]="samples" mode="subject" (timepointCreated)="getTimepoints()" (timepointUpdated)="getTimepoints()"
+      (timepointDeleted)="getTimepoints()">
+    </app-timeline-editor>
+  </c-card-body>
+</c-card>

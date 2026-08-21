@@ -1,0 +1,394 @@
+.modal-body {
+    padding: 20px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+}
+
+.panel {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+
+    .panel-header {
+        padding: 12px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+
+        h6 {
+            margin: 0 0 10px 0;
+        }
+
+        .search-input {
+            width: 100%;
+        }
+    }
+}
+
+.allele-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 350px;
+    overflow-y: auto;
+
+    li {
+        padding: 8px 12px;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:hover {
+            background: #f8f9fa;
+        }
+
+        input {
+            margin-right: 8px;
+        }
+
+        label {
+            margin: 0;
+            cursor: pointer;
+        }
+    }
+}
+
+.empty-message {
+    padding: 40px;
+    text-align: center;
+    color: #6c757d;
+}
+
+.manual-allele-section {
+    padding: 12px;
+    border-top: 1px solid #dee2e6;
+    background: #f8f9fa;
+
+    label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: block;
+    }
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+
+    button {
+        width: 100%;
+        padding: 10px;
+
+        i {
+            margin-right: 5px;
+        }
+    }
+}
+
+.clustered-alleles-list {
+    max-height: 450px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.allele-cluster {
+    margin-bottom: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+
+    .allele-cluster-header {
+        cursor: pointer;
+
+        .allele-tag {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            color: white;
+
+            .allele-name {
+                font-weight: 500;
+            }
+
+            .allele-count-badge {
+                background: rgba(255, 255, 255, 0.3);
+                padding: 2px 8px;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                margin: 0 8px;
+            }
+
+            i {
+                font-size: 0.75rem;
+            }
+        }
+    }
+
+    .allele-cluster-actions {
+        display: flex;
+        gap: 8px;
+        padding: 8px 12px;
+        background: #f8f9fa;
+        border-top: 1px solid #e0e0e0;
+
+        button {
+            flex: 1;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+        }
+    }
+
+    .allele-subjects-list {
+        border-top: 1px solid #e0e0e0;
+        max-height: 200px;
+        overflow-y: auto;
+
+        .subject-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 12px;
+            border-bottom: 1px solid #f0f0f0;
+
+            &.has-allele {
+                background: #e8f5e9;
+            }
+
+            &.missing-allele {
+                background: #ffebee;
+            }
+
+            .subject-name {
+                font-size: 0.85rem;
+            }
+
+            .subject-actions {
+                .btn-xs {
+                    padding: 2px 6px;
+                    font-size: 0.7rem;
+
+                    i {
+                        margin: 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.btn-xs {
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    border-radius: 4px;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .modal-body {
+        padding: 12px;
+    }
+
+    .action-buttons {
+        margin: 15px 0;
+        flex-direction: row;
+    }
+
+    .allele-cluster-header .allele-tag {
+        flex-wrap: wrap;
+
+        .allele-count-badge {
+            order: 2;
+        }
+
+        i {
+            order: 3;
+        }
+    }
+}
+
+.disabled-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    pointer-events: none;
+
+    .disabled-message {
+        background-color: white;
+        color: #212529;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        font-weight: 500;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        pointer-events: none;
+
+        i {
+            color: #212529;
+            font-size: 1.2rem;
+        }
+    }
+}
+
+.fade-content {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.allele-tag i.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+#allele-picker {
+    position: relative;
+    min-height: 300px;
+}
+
+.scrub-a87528 {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    width: 100%;
+}
+
+.scrub-5d97c6 {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    min-width: 101.5%;
+}
+
+.scrub-8e0008 {
+    width: 40%;
+}
+
+.scrub-92353e {
+    margin-top: 8px;
+    width: 100%;
+}
+
+.scrub-1b658c {
+    border-radius: 0%;
+    border: var(--cui-list-group-border-width) solid var(--cui-list-group-border-color) !important;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    max-height: 250px;
+    min-height: 250px;
+    overflow-y: scroll;
+    padding: 0;
+}
+
+.scrub-7fd0fd {
+    padding: 10px;
+}
+
+.scrub-741328 {
+    list-style: none;
+    padding: 8px 10px;
+}
+
+.scrub-f15522 {
+    margin-right: 8px;
+}
+
+.scrub-1e5e83 {
+    margin-bottom: 0;
+}
+
+.scrub-dadc45 {
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.scrub-e38d8d {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.scrub-be70d9 {
+    width: 100%;
+}
+
+.scrub-06d6f9 {
+    min-width: 20%;
+}
+
+.scrub-26574e {
+    opacity: 0%;
+    width: 100%;
+}
+
+.scrub-f8abac {
+    border-radius: 0%;
+    gap: 10px;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    max-height: 250px;
+    min-height: 250px;
+    overflow-y: scroll;
+}
+
+.scrub-680c05 {
+    padding-right: 3px;
+}
+
+.scrub-dad28b {
+    align-content: flex-start;
+    border-radius: 0%;
+    border: var(--cui-list-group-border-width) solid var(--cui-list-group-border-color) !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+    max-height: 250px;
+    min-height: 250px;
+    overflow-y: scroll;
+    padding: 5px;
+}
+
+.scrub-f21fb9 {
+    list-style: none;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.scrub-b4b826 {
+    cursor: pointer;
+    margin-right: 5px;
+    text-align: center;
+    width: 18px;
+}
+
+.scrub-f74950 {
+    white-space: nowrap;
+    margin-left: -7.5px;
+}
+
+.badge {
+    border-radius: 5px;
+    
+}

@@ -1,0 +1,56 @@
+.alleles {
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+
+    scrollbar-gutter: stable;
+    box-sizing: content-box;
+
+    --gutter: 14px;
+    padding-right: var(--gutter);
+    margin-right: calc(-1 * var(--gutter));
+    box-sizing: content-box;
+
+    @supports not (scrollbar-gutter: stable) {
+        &.alleles {
+            --gutter: 14px;
+            padding-right: var(--gutter);
+            margin-right: calc(-1 * var(--gutter));
+            box-sizing: content-box;
+        }
+    }
+
+    .allele-tag {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+        line-height: 18px;
+        width: fit-content;
+        padding: 2px 8px;
+        margin: 2px 0px 2px 0px;
+        border-radius: 4px;
+        color: #f2f5fa;
+        white-space: nowrap;
+    }
+}
+
+.meta {
+    font-size: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #4b5563;
+        display: inline-block;
+    }
+}
+
+.scrub-5f2b2a {
+  cursor: pointer;
+  margin-left: 2.5px;
+}

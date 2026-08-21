@@ -1,0 +1,16 @@
+@import "variables";
+
+$enable-ltr: true;
+$enable-rtl: true;
+
+@import "@coreui/coreui/scss/coreui";
+
+@import "layout";
+
+@import "fixes";
+
+@import "examples";
+
+@import "custom";
+
+@import "font-awesome/scss/font-awesome.scss";

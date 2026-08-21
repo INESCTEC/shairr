@@ -1,0 +1,16 @@
+.buttons-action {
+    justify-content: space-between;
+
+    button:only-child {
+        margin-left: auto;
+    }
+}
+
+.mhc-class {
+    display: flex;
+    flex-direction: column;
+}
+
+option {
+    width: 100%;
+}

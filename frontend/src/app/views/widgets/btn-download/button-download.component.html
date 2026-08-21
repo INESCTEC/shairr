@@ -1,0 +1,12 @@
+<button cButton class="d-flex gap-2 align-items-center justify-content-center" type="button" (click)="onDownloadClick()"
+    [disabled]="downloading">
+    <ng-container *ngIf="!downloading">
+        <ng-content></ng-content>
+    </ng-container>
+    <ng-container *ngIf="downloading">
+        <div>
+            <c-spinner size="sm" class="mr-4"></c-spinner>
+        </div>
+        <div>Download in progress</div>
+    </ng-container>
+</button>

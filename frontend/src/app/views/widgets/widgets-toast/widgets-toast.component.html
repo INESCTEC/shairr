@@ -1,0 +1,26 @@
+<c-toaster [placement]="position" class="p-3" position="fixed">
+    <c-toast 
+        *ngFor="let toast of toaster.toasts$ | async"
+        [visible]="true"
+        [autohide]="toast.autohide === true"
+        [delay]="toast.delay || 5000"
+        (hiddenChange)="toaster.removeToast(toast.id)"
+        class="mb-2 toast-custom"
+        [ngStyle]="{'background': getToastGradient(toast.type)}"
+    >
+        <c-toast-header [closeButton]="false" (closeButtonClick)="toaster.removeToast(toast.id)" 
+                       class="border-bottom toast-header-custom" 
+                       [ngStyle]="{'background': 'transparent', 'border-bottom-color': getToastColor(toast.type), 'border-bottom-width': '2px'}">
+            <span class="d-flex align-items-center justify-content-center scrub-f5d6c7" 
+                  [style.backgroundColor]="getToastColor(toast.type)">
+                <i class="fa" [ngClass]="'fa ' + getToastIcon(toast.type) + ' scrub-0edc08'"></i>
+            </span>
+            <strong [style.marginLeft]="'5px'" [style.color]="getToastColor(toast.type)">{{ toast.title }}</strong>
+            <small class="ms-2 text-body-secondary">(<span class="fst-italic">{{ toast.timestamp | date:'shortTime' }}</span>)</small>
+            <i class="fa fa-times ms-auto close-icon" (click)="toaster.removeToast(toast.id)"></i>
+        </c-toast-header>
+        <c-toast-body [ngStyle]="{'background': 'transparent'}">
+            {{ toast.message }}
+        </c-toast-body>
+    </c-toast>
+</c-toaster>

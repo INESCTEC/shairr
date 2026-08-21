@@ -1,0 +1,49 @@
+.disease-autocomplete {
+  .disease-option {
+    padding: 0.25rem 0;
+    
+    .disease-label {
+      color: var(--cui-dropdown-link-color);
+      margin-bottom: 0.125rem;
+    }
+    
+    .disease-id {
+      font-family: var(--cui-font-monospace);
+      font-size: 0.75rem;
+    }
+    
+    .disease-synonyms {
+      font-size: 0.75rem;
+      line-height: 1.2;
+    }
+    
+    .disease-definition {
+      font-size: 0.75rem;
+      line-height: 1.2;
+      font-style: italic;
+      border-left: 2px solid var(--cui-border-color);
+      padding-left: 0.5rem;
+    }
+  }
+  
+  .dropdown-item {
+    &:hover,
+    &.active {
+      .disease-label {
+        color: var(--cui-dropdown-link-hover-color);
+      }
+    }
+  }
+}
+
+.scrub-2b2369 {
+  line-height: 24px;
+}
+
+.scrub-0ef836 {
+  max-height: 300px;
+  overflow-y: auto;
+  position: absolute;
+  top: 100%;
+  z-index: 1000;
+}

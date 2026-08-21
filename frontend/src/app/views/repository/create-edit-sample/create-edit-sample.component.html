@@ -1,0 +1,330 @@
+<c-card>
+  <c-card-header>
+    <c-row class="scrub-de9554">
+      <span cCol>
+        <strong>{{ router.url.includes('edit') ? 'Edit Sample: ' : (router.url.includes('create') && savedSample ?
+          'Associate Files to Sample' : 'Create Sample') }}{{ router.url.includes('edit') ?
+          sample?.sample_id! : ''}}
+        </strong>
+      </span>
+    </c-row>
+
+  </c-card-header>
+
+  <c-card-body *ngIf="!loading && sample">
+    <form cForm [name]="sampleForm" #sampleForm="ngForm" class="mb-3">
+      <c-row class="p-3" class="scrub-626a3d" *ngIf="sample">
+        <div cRow class="mb-3" *ngIf="!savedSample">
+          <c-alert *ngIf="showAlert()" color="danger" id="form-alert">
+
+          </c-alert>
+        </div>
+
+        <div cRow class="mb-3" *ngIf="!savedSample">
+          <div cCol>
+            <label cLabel for="selectSampleIdStudy">Study ID</label>
+            <select cFormControl id="selectSampleIdStudy" class="form-control form-select"
+              placeholder="Study Identifier" [(ngModel)]="sample.id_study" name="selectSampleIdStudy" required>
+              <option *ngFor="let study of studies" [ngValue]="study.id">{{ study.study_id }}</option>
+            </select>
+            <div cFormText>
+              Study associated with sample.
+            </div>
+          </div>
+
+          <div cCol>
+            <label cLabel for="selectSampleIdSubject">Subject ID</label>
+            <select cFormControl id="selectSampleIdSubject" class="form-control form-select"
+              placeholder="Subject Identifier" [(ngModel)]="sample.id_subject" (change)="onIdSubjectChange()" name="selectSampleIdSubject" required>
+              <option *ngFor="let subject of subjects" [ngValue]="subject.id">{{ subject.subject_id }}</option>
+            </select>
+            <div cFormText>
+              Subject associated with sample.
+            </div>
+          </div>
+        </div>
+
+        <div cRow class="mb-3" *ngIf="!savedSample">
+          <div cCol>
+            <label cLabel for="inputSampleSampleId">Sample ID</label>
+            <div class="input-group">
+
+              <input cFormControl id="inputSampleSampleId" class="form-control" [(ngModel)]="sample.sample_id"
+                name="SampleSampleId" placeholder="Sample ID" required />
+              <button cButton class="btn btn-primary" type="button" (click)="generateSampleId()">
+                Generate
+              </button>
+            </div>
+            <div cFormText>
+              Identifier of the sample.
+            </div>
+          </div>
+
+          <div cCol>
+            <label cLabel for="inputSampleSampleType">Sample Type</label>
+            <input cFormControl id="inputSampleSampleType" class="form-control" [(ngModel)]="sample.sample_type"
+              name="SampleSampleType" placeholder="Sample type" required />
+            <div cFormText>
+              Sample type of the sample.
+            </div>
+          </div>
+        </div>
+
+        <div cRow class="mb-3" *ngIf="!savedSample">
+          <div cCol>
+            <label cLabel for="selectSampleTimepoint">Associated Timepoint</label>
+            <select cFormControl id="selectSampleTimepoint" class="form-select form-control"
+              [(ngModel)]="sample.id_timepoint" name="selectSampleTimepoint">
+              <option [ngValue]="null">-- No timepoint associated --</option>
+              <option *ngFor="let timepoint of getFilteredTimepoints()" [ngValue]="timepoint.id">
+                {{ timepoint.description }} - {{ timepoint.time_point }} {{ timepoint.units_of_measurement }}
+                (ID: {{ timepoint.id_relative_time_point || 'N/A' }})
+              </option>
+            </select>
+            <div cFormText>
+              Select the timepoint this sample belongs to.
+            </div>
+          </div>
+
+          <div cCol *ngIf="url.includes('edit')">
+            <label cLabel for="filter-select">Associated Files</label>
+            <div class="scrub-548c61" *ngIf="!uploadingFiles">
+              <select cFormControl class="form-select form-control scrub-a429bb" id="filter-select"
+                (change)="onFileSelect($event)" name="fileSelect">
+                <option [ngValue]="[-1, '']" disabled selected>Select a file to add...</option>
+                <optgroup label="Raw Files" class="scrub-d40999">
+                  <option *ngFor="let rawFile of reads" [value]="[getReadDatasetId(rawFile), 'read']"
+                    class="scrub-8d5c4f" [disabled]="isReadFileAdded(rawFile)">
+                    {{ getReadDataset(rawFile) }}
+                  </option>
+                </optgroup>
+                <optgroup label="Annotated Files" class="scrub-d40999">
+                  <option *ngFor="let annotatedFile of annotated"
+                    [value]="[getAnnotatedDatasetId(annotatedFile), 'annotation']" class="scrub-8d5c4f"
+                    [disabled]="isAnnotatedFileAdded(annotatedFile)">
+                    {{ getAnnotatedDataset(annotatedFile) }}
+                  </option>
+                </optgroup>
+              </select>
+              <input id="input-upload-files" accept=".fastq.gz, .fastq, .gz, .tsv" type="file" multiple
+                class="scrub-9c7663" />
+
+              <button cButton class="btn btn-primary" (click)="uploadFiles()" class="scrub-76168a">
+                <i class="fa fa-upload"></i> Upload
+              </button>
+            </div>
+
+            <div *ngIf="uploadingFiles" class="scrub-8ced3a">
+              <div class="progress scrub-741d7f">
+                <div class="progress-bar progress-bar-striped"
+                  [class.progress-bar-animated]="uploadingFiles && uploadProgress < 100" role="progressbar"
+                  [style.width.%]="uploadProgress" [attr.aria-valuenow]="uploadProgress" aria-valuemin="0"
+                  aria-valuemax="100">
+                  {{ uploadProgress }}%
+                </div>
+              </div>
+              <div cFormText>
+                Uploading ({{ uploadProgress }}%)...
+              </div>
+            </div>
+
+            <div cFormText>
+              Files associated with the sample.
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="savedSample && sample.id > 0">
+          <label cLabel>Associated Files</label>
+          <div class="file-upload-area mb-3" *ngIf="!uploadingFiles">
+            <div class="upload-dropzone" (click)="triggerFileUpload()">
+              <i class="fa fa-cloud-upload fa-2x mb-2"></i>
+              <p>Click to upload files</p>
+              <small class="text-muted">Supports .fastq, .fastq.gz, .gz, .tsv</small>
+            </div>
+            <input #fileUploadInput id="input-upload-files-grid" accept=".fastq.gz, .fastq, .gz, .tsv" type="file"
+              multiple style="display: none" (change)="onGridFileSelect($event)" />
+          </div>
+
+          <div *ngIf="uploadingFiles" class="scrub-8ced3a">
+            <div class="progress scrub-741d7f">
+              <div class="progress-bar progress-bar-striped"
+                [class.progress-bar-animated]="uploadingFiles && uploadProgress < 100" role="progressbar"
+                [style.width.%]="uploadProgress" [attr.aria-valuenow]="uploadProgress" aria-valuemin="0"
+                aria-valuemax="100">
+                {{ uploadProgress }}%
+              </div>
+            </div>
+            <div cFormText>Uploading ({{ uploadProgress }}%)...</div>
+          </div>
+
+          <div *ngIf="!uploadingFiles && (availableReads.length > 0 || availableAnnotated.length > 0)" class="mt-3">
+            <div cFormText class="mb-2">Available files to associate:</div>
+
+            <div *ngIf="availableReads.length > 0">
+              <label class="form-label small fw-bold">Raw Files</label>
+              <div class="file-grid">
+                <div *ngFor="let rawFile of availableReads" class="file-card" [class.file-card-info]="true"
+                  (click)="toggleFileSelection(rawFile, 'read')" [class.selected]="isFileSelected(rawFile, 'read')">
+                  <div class="file-card-header">
+                    <i class="fa fa-file-text-o"></i>
+                    <span class="file-name">{{ getReadDataset(rawFile).split(' (')[0] }}</span>
+                  </div>
+                  <div class="file-card-body">
+                    <small>{{ getReadDataset(rawFile).split('(')[1].replace(')', '') || 'No details' }}</small>
+                  </div>
+                  <div class="file-card-footer" *ngIf="isFileSelected(rawFile, 'read')">
+                    <i class="fa fa-check-circle"></i> Selected
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="availableAnnotated.length > 0" class="mt-3">
+              <label class="form-label small fw-bold">Annotated Files</label>
+              <div class="file-grid">
+                <div *ngFor="let annotatedFile of availableAnnotated" class="file-card" [class.file-card-success]="true"
+                  (click)="toggleFileSelection(annotatedFile, 'annotation')"
+                  [class.selected]="isFileSelected(annotatedFile, 'annotation')">
+                  <div class="file-card-header">
+                    <i class="fa fa-table"></i>
+                    <span class="file-name">{{ getAnnotatedDataset(annotatedFile).split(' (')[0] }}</span>
+                  </div>
+                  <div class="file-card-body">
+                    <small>{{ getAnnotatedDataset(annotatedFile).split('(')[1].replace(')', '') || 'No details'
+                      }}</small>
+                  </div>
+                  <div class="file-card-footer" *ngIf="isFileSelected(annotatedFile, 'annotation')">
+                    <i class="fa fa-check-circle"></i> Selected
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="selected-files-summary mt-3" *ngIf="selectedFilesToAdd.length > 0">
+              <label class="form-label small fw-bold">Files to add:</label>
+              <div class="selected-files-list">
+                <c-badge *ngFor="let file of selectedFilesToAdd" [color]="file.type === 'read' ? 'info' : 'success'"
+                  class="me-1 mb-1">
+                  <i class="fa fa-file-o me-1"></i>
+                  {{ file.type === 'read' ? getReadDataset(file.file).split(' (')[0] :
+                  getAnnotatedDataset(file.file).split(' (')[0] }}
+                  <i class="fa fa-times ms-2" style="cursor: pointer"
+                    (click)="removeFromSelection(file); $event.stopPropagation()"></i>
+                </c-badge>
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="!uploadingFiles && availableReads.length === 0 && availableAnnotated.length === 0 && showFilePickerInitialized"
+            class="text-muted text-center p-3">
+            <i class="fa fa-info-circle"></i> No files available. Upload files first.
+          </div>
+
+          <div cFormText>Select files to associate with this sample.</div>
+        </div>
+
+        <div *ngIf="router.url.includes('edit') && files?.length" class="mb-3">
+          <div cRow>
+            <div cCol>
+              <div class="scrub-cf5638">
+                <c-badge *ngFor="let file of files" class="file-badge"
+                  color="{{ file[1] === 'read' ? 'info' : 'success' }}" class="scrub-e69588">
+                  <div class="scrub-4371fd">
+                    <div class="scrub-1c639f">
+                      {{ file[0].filename }}
+                    </div>
+                    <div class="scrub-cea31e">
+                      ({{ file[0].line_count }} lines, {{ humanFileSize(file[0].filesize) }})
+                    </div>
+                  </div>
+                  <div class="scrub-bbb9d9">
+                    <div>
+                      <i class="fa fa-eye ms-1 scrub-5f2b2a"
+                        *ngIf="file[1] === 'annotation' || file[0].filename.includes('tsv')"
+                        (click)="seeFile(file[0])"></i>
+                      <i class="fa fa-download ms-1 scrub-5f2b2a" *ngIf="file[1] === 'read'"
+                        (click)="downloadFile(file[0])"></i>
+                    </div>
+                    <div>
+                      <i class="fa fa-times ms-1 scrub-5f2b2a" (click)="removeFile(file[0])"></i>
+                    </div>
+                  </div>
+                </c-badge>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div cRow class="mb-3" *ngIf="!savedSample">
+          <div cCol>
+            <label cLabel for="inputSampleTissue" class="scrub-6694a9">Tissue</label>
+            <app-uberon-autocomplete [placeholder]="'Search tissue (min 2 characters)...'" [showId]="true"
+              [initialValue]="selectedTissue" [displayText]="tissueDisplayText"
+              (uberonSelected)="onTissueSelected($event)">
+            </app-uberon-autocomplete>
+            <div cFormText>
+              Tissue of the sample (label and ontology identifier).
+            </div>
+          </div>
+
+          <div cCol>
+            <label cLabel for="inputSampleCellSubset" class="scrub-6694a9">Cell Subset</label>
+            <app-cell-autocomplete [placeholder]="'Search cell subset (min 2 characters)...'" [showId]="true"
+              [initialValue]="selectedCellSubset" [displayText]="cellSubsetDisplayText"
+              (cellSelected)="onCellSubsetSelected($event)">
+            </app-cell-autocomplete>
+            <div cFormText>
+              Cell subset of the sample (label and ontology identifier).
+            </div>
+          </div>
+        </div>
+
+        <div cRow class="mb-3" class="scrub-5f70ba" *ngIf="!savedSample">
+          <div cCol>
+            <label cLabel for="inputCellPhenotype">Cell Phenotype</label>
+            <input cFormControl id="inputCellPhenotype" type="text" class="form-control" placeholder="Cell Phenotype"
+              [(ngModel)]="sample.cell_phenotype" name="cellPhenotype" required />
+            <div cFormText>
+              Phenotype of the cells in the sample.
+            </div>
+          </div>
+
+          <div cCol>
+            <label cLabel for="inputSequencingType">Sequencing Type</label>
+            <select cFormControl id="inputSequencingType" class="form-select form-control"
+              [(ngModel)]="sample.sequencing_type" name="inputSequencingType" required>
+              <option [ngValue]="'BULK'">Bulk</option>
+              <option [ngValue]="'SINGLE_CELL'">Single-cell</option>
+              <option [ngValue]="'TEN_X'">10X</option>
+            </select>
+            <div cFormText>
+              Sequencing type of the sample.
+            </div>
+          </div>
+        </div>
+      </c-row>
+
+    </form>
+  </c-card-body>
+
+  <c-card-footer class="card-footer">
+    <button cButton class="btn btn-primary" [disabled]="showAlert()" (click)="saveSample(true)" class="scrub-c371f9">
+      {{ router.url.includes('create') && !savedSample ? 'Next' : 'Save' }}
+    </button>
+  </c-card-footer>
+</c-card>
+
+<c-card class="scrub-a3161d" *ngIf="!loading && sample?.id_subject && timepoints && router.url.includes('edit')">
+  <c-card-header>
+    <strong>Subject Timeline</strong>
+  </c-card-header>
+  <c-card-body>
+    <app-timeline-editor [subjectId]="sample?.id_subject ?? 0" [sampleId]="sample?.id ?? null"
+      [currentTimepointId]="sample?.id_timepoint ?? null" [subjects]="subjects" [samples]="samples" mode="sample"
+      (timepointCreated)="getTimepoints()" (timepointUpdated)="getTimepoints()" (timepointDeleted)="getTimepoints()"
+      (sampleAssigned)="assignToSample($event)" (sampleUnassigned)="unassignToSample($event)">
+    </app-timeline-editor>
+  </c-card-body>
+</c-card>

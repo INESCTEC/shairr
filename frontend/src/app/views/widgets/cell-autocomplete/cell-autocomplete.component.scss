@@ -1,0 +1,53 @@
+.autocomplete-container {
+    position: relative;
+    width: 100%;
+}
+
+.autocomplete-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    z-index: 1000;
+    list-style: none;
+    padding: 0;
+    margin: 2px 0 0 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.autocomplete-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    
+    &:hover {
+        background-color: #f0f0f0;
+    }
+    
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.term-label {
+    font-weight: bold;
+    color: #333;
+}
+
+.term-id {
+    color: #666;
+    font-size: 0.85em;
+    font-family: monospace;
+}
+
+.term-synonyms {
+    color: #888;
+    font-size: 0.8em;
+    font-style: italic;
+    margin-top: 2px;
+}

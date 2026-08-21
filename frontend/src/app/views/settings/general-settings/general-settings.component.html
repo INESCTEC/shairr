@@ -1,0 +1,72 @@
+<c-card class="scrub-273e41">
+    <c-card-header>
+        <h5 class="mb-0">General Settings</h5>
+    </c-card-header>
+    <c-card-body class="p-3">
+        <div cRow class="mb-3" class="scrub-5f70ba">
+            <div cCol>
+                <label cLabel for="repositoryName">Repository Name</label>
+                <div class="scrub-9341e0" *ngIf="repository">
+                    <input cFormControl id="repositoryName" type="text" class="form-control"
+                        placeholder="Repository Name" [(ngModel)]="repository.name"
+                        (change)="saveRepositoryName($event)" name="repositoryName" required autofocus />
+                    <button cButton type="button" class="btn btn-primary"
+                        (click)="saveRepositoryName($event)">Save</button>
+                </div>
+                <div class="scrub-063b3b" *ngIf="!repository">
+                    <input cFormControl id="repositoryName" type="text" class="form-control"
+                        placeholder="Repository Name" [ngModel]="'Nothing to change.'"
+                        (change)="saveRepositoryName($event)" name="repositoryName" required autofocus disabled />
+                    <select cFormSelect class="form-select form-control" [disabled]="!repository"
+                        [(ngModel)]="repository" (change)="saveRepositoryName($event)" name="repositorySelect">
+                        <option selected>No repository connections saved.</option>
+                    </select>
+                    <button cButton type="button" class="btn btn-primary">Save</button>
+                </div>
+                <div cFormText>
+                    User-defined repository name; by default, it is set to 'My ShAIRR Repository'.
+                </div>
+            </div>
+        </div>
+    </c-card-body>
+</c-card>
+
+<c-card class="mt-3">
+    <c-card-header>
+        <h5 class="mb-0">User Properties</h5>
+    </c-card-header>
+
+    <c-card-body>
+        <div *ngFor="let propertyEntry of propertyEntries; let propertyIndex = index" class="mb-2">
+
+            <c-row class="g-2 align-items-center">
+
+                <c-col md="3">
+                    <input cFormControl type="text" placeholder="Property Key" [(ngModel)]="propertyEntry.key"
+                        (ngModelChange)="onPropertyChanged()" name="propertyKey{{ propertyIndex }}">
+                </c-col>
+
+                <c-col md="7">
+                    <input cFormControl type="text" placeholder="Property Value" [(ngModel)]="propertyEntry.value"
+                        (ngModelChange)="onPropertyChanged()" name="propertyValue{{ propertyIndex }}">
+                </c-col>
+
+                <c-col md="2">
+                    <button *ngIf="propertyEntry.key || propertyEntry.value" cButton color="danger" variant="outline"
+                        type="button" (click)="removeProperty(propertyIndex)">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </c-col>
+
+            </c-row>
+        </div>
+
+        <c-row class="mt-3">
+            <c-col class="d-flex justify-content-end">
+                <button cButton color="primary" type="button" (click)="saveProperties()">
+                    Save Properties
+                </button>
+            </c-col>
+        </c-row>
+    </c-card-body>
+</c-card>
