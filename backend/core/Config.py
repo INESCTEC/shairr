@@ -61,6 +61,8 @@ class Config(BaseSettings):
 
     docker: bool = False
 
+    port: int = 8000
+
     # Root directory shared by API and worker containers.
     # Point this to an external shared folder (for example an NFS mount).
     shared_data_root: str = "/app/data"

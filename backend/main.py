@@ -90,7 +90,7 @@ def main():
         reload=True,
         host='0.0.0.0',
         log_config="log_conf.yaml",
-        port=8000,
+        port=config.port,
         reload_includes=["*.py"],
         reload_excludes=[
             "data/*", "venv/*", ".git/*", "__pycache__/*", ".mypy_cache/*", ".pytest_cache/*", "node_modules/*",

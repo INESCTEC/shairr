@@ -1,0 +1,13 @@
+export const environmentBase = {
+    production: false,
+
+    shairrApiUrl: "http://localhost:8000",
+
+    authentication: {
+        url: 'http://localhost:8080/auth',
+        realm: 'shairr',
+        clientId: 'frontend'
+    },
+
+    emblEbiUrl: "https://www.ebi.ac.uk/cgi-bin/ipd/api"
+};

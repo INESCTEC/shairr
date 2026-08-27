@@ -30,13 +30,12 @@ router = APIRouter()
 
 logger = logging.getLogger(__name__)
 
-@router.api_route("/repertoire", methods=["GET"])
 def get_repertoires(
     user: Annotated[Optional[UserData], Depends(OidcWorkflow.get_optional_userinfo)]
 ) -> AirrRepertoireResponse:
     if user is not None:
         logger.info("Authenticated request to /repertoire")
-        studies = StudyRepository.get_studies_selected_for_stats()
+        studies = StudyRepository.get_all()
     else:
         logger.info("Anonymous request to /repertoire")
 
@@ -146,8 +145,10 @@ def get_repertoires(
         }
     )
 
+router.get("/repertoire")(get_repertoires)
+router.post("/repertoire")(get_repertoires)
 
-@router.api_route("/repertoire/{repertoire_id}", methods=["GET"])
+
 def get_repertoire_by_id(
     repertoire_id: str,
     user: Annotated[Optional[UserData], Depends(OidcWorkflow.get_optional_userinfo)]
@@ -221,26 +222,24 @@ def get_repertoire_by_id(
         }
     )
 
-    return AirrRepertoireResponse.model_validate(
-        {
-            "Repertoire": [airr_repertoire]
-        }
-    )
+    return AirrRepertoireResponse.model_validate({
+        "Repertoire": [airr_repertoire]
+    })
 
-@router.api_route("/rearrangement", methods=["POST"])
+router.get("/repertoire/{repertoire_id}")(get_repertoire_by_id)
+router.post("/repertoire/{repertoire_id}")(get_repertoire_by_id)
+
+
+@router.api_route("/rearrangement")
 def get_rearrangements(
     airr_filter: AirrQueryModel,
     user: Annotated[Optional[UserData], Depends(OidcWorkflow.get_optional_userinfo)]
-
 ) -> StreamingResponse:
     annotation_db = filter_annotations_by_query(airr_filter)
 
     logger.debug(f"Found annotations {len(annotation_db)}")
 
-    dataset_ids = [
-        annotation.id_dataset for annotation in annotation_db
-            if annotation is not None
-    ]
+    dataset_ids = [annotation.id_dataset for annotation in annotation_db if annotation is not None]
 
     logger.debug(f"Found datasets {dataset_ids}")
 
@@ -313,3 +312,6 @@ def get_rearrangements(
                 f"attachment; filename={final_filename}"
         },
     )
+
+router.get("/rearrangement")(get_rearrangements)
+router.post("/rearrangement")(get_rearrangements)
