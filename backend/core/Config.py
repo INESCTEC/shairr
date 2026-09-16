@@ -65,7 +65,7 @@ class Config(BaseSettings):
 
     # Root directory shared by API and worker containers.
     # Point this to an external shared folder (for example an NFS mount).
-    shared_data_root: str = "/app/data"
+    shared_data_root: str = "/shared/shairr"
 
     def model_post_init(self, __context) -> None:
         root = self.shared_data_root.rstrip("/")
