@@ -2,7 +2,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: /Dockerfile.dev
+      dockerfile: Dockerfile.dev
     container_name: shairr-frontend-dev
     ports:
       - 4200:4200
