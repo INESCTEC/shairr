@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from schemas.json.airr.AirrInfo import AirrInfo
+from schemas.json.airr.AirrInfo import AirrInfoResponse
 from schemas.json.airr.DataProcessing import AirrDataProcessing
 from schemas.json.airr.Sample import AirrSample
 from schemas.json.airr.Study import AirrStudy
@@ -26,4 +26,4 @@ class AirrRepertoireResponse(BaseModel):
         "from_attributes": True
     }
     Repertoire: list[AirrRepertoire]
-    Info: AirrInfo = Field(default_factory=AirrInfo)
+    Info: AirrInfoResponse = Field(default_factory=AirrInfoResponse)

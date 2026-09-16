@@ -96,13 +96,19 @@ class Files:
         return os.path.join(destination, filename)
 
     @staticmethod
+    def get_download_destination(id_user: int) -> str:
+        destination: str = os.path.join(config.downloads_path, str(id_user))
+
+        Files.coalesce_directory(destination)
+
+        return destination
+
+    @staticmethod
     def format_download_destination(id_user: int, filename: str) -> str:
         """
         Format the destination path for a downloaded file.
         """
-        destination: str = os.path.join(config.downloads_path, str(id_user))
-
-        Files.coalesce_directory(destination)
+        destination = Files.get_download_destination(id_user)
 
         return os.path.join(destination, filename)
 
