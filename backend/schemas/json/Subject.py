@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, List
 from pydantic import BaseModel, ConfigDict
 from schemas.db.Ontology import Ontology
@@ -5,12 +6,15 @@ from schemas.json.Diagnosis import DiagnosisResponse
 from schemas.json.airr.Subject import Genotype, AirrSubject
 from schemas.json.Genotype import GenotypeBase
 
+logger = logging.getLogger(__name__)
+
 class SubjectBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id_study: int
     subject_id: str
     synthetic: Optional[bool]
     species: Optional[Ontology]
+    genotypes: Optional[List[GenotypeBase]] = []
 
     @classmethod
     def from_db_model(cls, subject_db):
@@ -26,8 +30,13 @@ class SubjectBase(BaseModel):
         }
         
         # Handle genotypes separately
-        if hasattr(subject_db, 'genotypes') and subject_db.genotypes is not None:
+        has_genotypes = hasattr(subject_db, 'genotypes')
+
+        logger.debug(f"Subject has genotypes? {has_genotypes}")
+
+        if has_genotypes and subject_db.genotypes is not None:
             genotypes = []
+
             for genotype in subject_db.genotypes:
                 if hasattr(genotype, '__dict__'):
                     # Include ALL required fields from GenotypeBase
@@ -41,6 +50,8 @@ class SubjectBase(BaseModel):
                     genotypes.append(GenotypeBase.model_validate(genotype_dict))
                 else:
                     genotypes.append(genotype)
+
+            logger.debug(f"Determined genotypes: {genotypes}")
             subject_dict['genotypes'] = genotypes
             
         return cls.model_validate(subject_dict)
@@ -48,7 +59,11 @@ class SubjectBase(BaseModel):
     def as_airr(self) -> AirrSubject:
         genotype = None
 
-        if hasattr(self, 'genotypes') and self.genotypes:
+        has_genotypes = hasattr(self, 'genotypes')
+
+        logger.debug(f"Subject has AIRR genotypes? {has_genotypes}")
+
+        if has_genotypes and self.genotypes:
             genotypes_list = []
             for g in self.genotypes:
                 if hasattr(g, 'name') and hasattr(g, 'mhc_class'):

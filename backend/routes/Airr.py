@@ -75,6 +75,8 @@ def get_repertoires(
             f"(id={subject_db.id})"
         )
 
+        logger.debug(f"Acquired subject dict: {subject}")
+
         study_db = StudyRepository.get(subject.id_study)
 
         if not study_db:
