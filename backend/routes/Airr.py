@@ -241,49 +241,39 @@ def get_rearrangements(
 
     logger.debug(f"Found annotations {len(annotation_db)}")
 
-    dataset_ids = [annotation.id_dataset for annotation in annotation_db if annotation is not None]
+    accessible_dataset_ids = set()
 
-    logger.debug(f"Found datasets {dataset_ids}")
+    for annotation in annotation_db:
+        sample = SampleRepository.get(annotation.id_sample)
 
-    datasets = DatasetRepository.get_all_in(dataset_ids)
+        if sample is None:
+            continue
+
+        study = StudyRepository.get(sample.id_study)
+
+        if study is None:
+            continue
+
+        if user is None and not study.public:
+            continue
+
+        accessible_dataset_ids.add(annotation.id_dataset)
+
+    if not accessible_dataset_ids:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=("No accessible datasets available for the given criteria." ))
+
+    logger.debug(f"Found datasets {accessible_dataset_ids}")
+
+    datasets = DatasetRepository.get_all_in(list(accessible_dataset_ids))
 
     if not datasets:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No datasets found for the given repertoire ID.")
-
-    accessible_datasets = []
-
-    for dataset in datasets:
-        sample = SampleRepository.get(dataset.id_sample)
-
-        if sample:
-            subject = SubjectRepository.get(sample.id_subject)
-
-            if subject:
-                study = StudyRepository.get(subject.id_study)
-
-                if study:
-                    # Anonymous users only see public studies
-                    if user is None and not study.public:
-                        logger.debug(f"Skipping dataset {dataset.id} from non-public study")
-                        continue
-
-                    accessible_datasets.append(dataset)
-
-                else:
-                    logger.debug(f"Skipping dataset {dataset.id} from inaccessible study")
-            else:
-                logger.debug(f"Skipping dataset {dataset.id} - subject not found")
-        else:
-            logger.debug(f"Skipping dataset {dataset.id} - sample not found")
-
-    if not accessible_datasets:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=("No accessible datasets available for the given criteria." ))
 
     df = pd.DataFrame()
 
     filename_concats: list[str] = []
 
-    for dataset in accessible_datasets:
+    for dataset in datasets:
 
         if not os.path.isfile(dataset.filepath):
             logger.warning(f"Dataset with ID {dataset.id} doesn't have a physical file at {dataset.filepath}.")

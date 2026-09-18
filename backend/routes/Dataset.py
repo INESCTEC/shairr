@@ -372,6 +372,7 @@ def get_plaintext(
     head: int = Query(description="Return a specific number of lines from the file", default=None)
 ) -> str:
     dataset: Dataset = DatasetRepository.get(id_dataset)
+
     if not dataset:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     
