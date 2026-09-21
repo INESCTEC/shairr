@@ -31,7 +31,7 @@
     "@coreui/icons": "^3.0.1",
     "@coreui/icons-angular": "~5.2.22",
     "angular-plotly.js": "^6.0.0",
-    "annotation": "file:packages/annotation-0.0.15.tgz",
+    "annotation": "file:packages/annotation-0.0.16.tgz",
     "file-saver": "^2.0.5",
     "font-awesome": "^4.7.0",
     "jquery": "^4.0.0",
