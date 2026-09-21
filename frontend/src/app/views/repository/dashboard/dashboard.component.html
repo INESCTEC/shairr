@@ -14,7 +14,7 @@
 
 <c-card class="mb-4">
     <c-card-body>
-        <c-tabs [activeItemKey]="'studies'" (activeItemKeyChange)="handleChange($event)">
+        <c-tabs [activeItemKey]="activeTab" (activeItemKeyChange)="handleChange($event)">
             <c-tabs-list variant="tabs" class="mb-4">
                 <button cTab itemKey="studies" class="p-3">
                     <i class="fa fa-database"></i> Repository
@@ -408,10 +408,10 @@
                             </c-button>
 
                             
-                            <c-badge cButton class="btn btn-primary repository-action-button" (click)="goToSendFilesToAnnotation()">
+                            <c-button cButton class="btn btn-primary" (click)="goToSendFilesToAnnotation()">
                                 <i class="fa fa-arrow-up me-2"></i>
                                 Send Files for Annotation
-                            </c-badge>
+                            </c-button>
                             
                         </div>
                     </div>
