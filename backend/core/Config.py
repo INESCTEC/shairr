@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Optional
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -12,6 +13,27 @@ class AuthConfig(BaseModel):
     realm: str
     client_id: str
     client_secret: str
+
+class AirrInfoConfig(BaseModel):
+    """
+    Repository information exposed through the AIRR /info endpoint.
+    """
+    title: str = "ShAIRR"
+    description: str = "AIRR Data Commons API for ShAIRR"
+    version: str = "1.0.0"
+
+    contact_name: Optional[str] = None
+    contact_url: Optional[str] = None
+    contact_email: Optional[str] = None
+
+    license_name: Optional[str] = None
+    license_url: Optional[str] = None
+
+    # Version of the ADC API specification implemented by the service
+    api_version: str = "1.0.0"
+
+    # Version of the AIRR schema used by the served records
+    schema_version: str = "1.3.1"
 
 class Config(BaseSettings):
     """
@@ -51,6 +73,8 @@ class Config(BaseSettings):
     root_path: str = ""
 
     repertoire_separator: str = "|"
+
+    airr_info: AirrInfoConfig = AirrInfoConfig()
 
     model_config = SettingsConfigDict(env_file='./.env', env_nested_delimiter='.', extra="ignore")
 

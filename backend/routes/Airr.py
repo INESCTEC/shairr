@@ -22,6 +22,7 @@ from schemas.json.Study import StudyBase
 from schemas.json.Subject import SubjectBase
 from schemas.json.User import UserData
 from schemas.json.airr.AirrFilter import AirrQueryModel
+from schemas.json.airr.AirrInfo import AirrContact, AirrInfoResponse, AirrLicense, AirrServiceInfoResponse
 from schemas.json.airr.Repertoire import AirrRepertoire, AirrRepertoireResponse
 
 from services.AirrFilterService import filter_annotations_by_query
@@ -29,6 +30,41 @@ from services.AirrFilterService import filter_annotations_by_query
 router = APIRouter()
 
 logger = logging.getLogger(__name__)
+
+@router.get("/info", response_model_exclude_none=True)
+def get_info() -> AirrServiceInfoResponse:
+    info = config.airr_info
+
+    contact = None
+    if info.contact_name or info.contact_url or info.contact_email:
+        contact = AirrContact(name=info.contact_name, url=info.contact_url, email=info.contact_email)
+
+    license_info = None
+    if info.license_name:
+        license_info = AirrLicense(name=info.license_name, url=info.license_url)
+
+    return AirrServiceInfoResponse(
+        title=info.title,
+        description=info.description,
+        version=info.version,
+        contact=contact,
+        license=license_info,
+        api=AirrInfoResponse(
+            title="AIRR Data Commons API",
+            description="Major Version 1 of the Adaptive Immune Receptor Repertoire (AIRR) data repository web service application programming interface (API).",
+            version=info.api_version,
+            contact=AirrContact(name="AIRR Community", url="https://github.com/airr-community"),
+            license=AirrLicense(name="Creative Commons Attribution 4.0 International", url="https://creativecommons.org/licenses/by/4.0/"),
+        ),
+        airr_schema=AirrInfoResponse(
+            title="AIRR Schema",
+            description="Schema definitions for AIRR standards objects",
+            version=info.schema_version,
+            contact=AirrContact(name="AIRR Community", url="https://github.com/airr-community"),
+            license=AirrLicense(name="Creative Commons Attribution 4.0 International", url="https://creativecommons.org/licenses/by/4.0/"),
+        ),
+    )
+
 
 def get_repertoires(
     user: Annotated[Optional[UserData], Depends(OidcWorkflow.get_optional_userinfo)]
