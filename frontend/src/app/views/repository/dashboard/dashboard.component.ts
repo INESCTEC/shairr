@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DatasetModel } from 'src/models/shairr/datasources/dataset.model';
 import { DefaultModalService } from 'src/services/default-modal.service';
 import { ToastService, ToastType } from 'src/services/toast.service';
@@ -23,16 +23,29 @@ export class DashboardComponent {
     subjects: SubjectModel[] = [];
     mhc_genotype_list_by_subject: Record<number, GenotypeModel[]> = {};
     datasets: DatasetModel[] = [];
+    private returnedAnnotationDataset: DatasetModel | null = null;
     card: boolean = true;
 
     constructor(private modalService: DefaultModalService,
         private router: Router,
+        private activatedRoute: ActivatedRoute,
         private datasourcesApiService: DatasourcesApiService,
         private toastService: ToastService
     ) {
         this.datasourcesApiService = datasourcesApiService;
         this.loading = false;
         this.card = true;
+
+        const returnedDataset = this.router.getCurrentNavigation()
+            ?.extras.state?.['annotationDataset'];
+
+        if (returnedDataset && typeof returnedDataset.id === 'number') {
+            this.returnedAnnotationDataset = returnedDataset as DatasetModel;
+        }
+
+        this.activeTab = this.activatedRoute.snapshot.queryParamMap.get('tab') === 'datasets'
+            ? 'datasets'
+            : 'studies';
 
         this.getStudies();
         this.getSubjects();
@@ -252,6 +265,19 @@ export class DashboardComponent {
             })
             .then((response: any) => {
                 this.datasets = response.filter((d: DatasetModel) => !d.filename.includes('csv'));
+
+                if (
+                    this.returnedAnnotationDataset &&
+                    !this.datasets.some(dataset =>
+                        dataset.id === this.returnedAnnotationDataset?.id
+                    )
+                ) {
+                    this.datasets = [
+                        this.returnedAnnotationDataset,
+                        ...this.datasets
+                    ];
+                }
+
                 this.loading = false;
             })
             .catch((error: Error) => {
@@ -371,7 +397,7 @@ export class DashboardComponent {
     }
 
     goToSendFilesToAnnotation() {
-        this.router.navigate(['/repository/annotate-files']);
+        this.router.navigate(['/repository/annotation']);
     }
 
     getStudyCellSubset(study: StudyModel) {

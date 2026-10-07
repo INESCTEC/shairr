@@ -8,6 +8,17 @@ import { CreateEditSubjectComponent } from './create-edit-subject/create-edit-su
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { OverviewComponent } from './statistics/overview/overview.component';
 
+import { KeycloakService } from 'keycloak-angular';
+import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
+
+import {
+    AnnotationComponent,
+    AnnotationResult,
+    AnnotationService,
+    ANNOTATION_CONTEXT
+} from 'annotation';
+
 const routes: Routes = [
     {
         path: '',
@@ -54,11 +65,32 @@ const routes: Routes = [
         component: CreateEditStudyComponent,
         data: { title: 'Edit Study' }
     },
+    /*     {
+    path: 'annotate-files',
+    component: AnnotateFilesComponent,
+    data: { title: 'Annotate Files' }
+    } */
     {
-        path: 'annotate-files',
-        component: AnnotateFilesComponent,
-        data: { title: 'Annotate Files' }
-    }
+        path: 'annotation',
+        component: AnnotationComponent,
+        providers: [
+            {
+                provide: ANNOTATION_CONTEXT,
+                useFactory: (keycloak: KeycloakService, router: Router) => ({
+                    apiUrl: environment.shairrApiUrl,
+                    getAccessToken: () => keycloak.getToken(),
+                    returnToHost: (dataset: AnnotationResult | null) =>
+                        router.navigate(['/repository'], {
+                            queryParams: { tab: 'datasets' },
+                            state: { annotationDataset: dataset }
+                        })
+                }),
+                deps: [KeycloakService, Router]
+            },
+            AnnotationService
+        ],
+        data: { title: 'Annotation' }
+    },
 ];
 
 @NgModule({
